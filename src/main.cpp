@@ -2,12 +2,12 @@
 
 #include <glad/glad.h>
 #include <SDL3/SDL.h>
-
-#include "shader.h"
-
 #include "imgui.h"
 #include "backends/imgui_impl_sdl3.h"
 #include "backends/imgui_impl_opengl3.h"
+
+#include "shader.h"
+#include <JAWEngine/vec2.h>
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -33,41 +33,16 @@ unsigned int indices[] = {  // note that we start from 0!
 	1, 2, 3    // second triangle
 };
 
-const char* vertexShaderSource = "#version 460 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"out vec4 vertexColor;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos, 1.0);\n"
-"	vertexColor = vec4(0.5, 0.0, 0.0, 1.0);\n"
-"}\0";
+JAW::Vec2 tri1 {0.2f, 0.0f};
+JAW::Vec2 tri2 {0.0f, 0.0f};
 
-const char* fragmentShaderSource = "#version 460 core\n"
-"out vec4 FragColor;\n"
-"uniform vec4 ourColor;\n"
-"void main()\n"
-"{\n"
-"FragColor = ourColor;\n"
-"}\0";
-
-const char* fragmentShaderSourceYellow = "#version 460 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
-"}\0";
 
 class Renderer {
 public:
 	void run() {
 		initWindow();
-
+		
 		setupGeometry();
-		
-		setupVertexShader();
-		setupFragmentShader();
-		createShaderProgram();
-		
 		loadShaders();
 
 		initImGui();
@@ -79,28 +54,29 @@ public:
 		cleanup();
 	}
 private:
-	SDL_Window* window;
-	SDL_Event event;
-	SDL_GLContext context;
+	//SDL stuff
+	SDL_Window* window{ nullptr };
+	SDL_Event event{};
+	SDL_GLContext context{};
 	
-	unsigned int VBO;
-	unsigned int vertexShader;
-	unsigned int fragmentShader, fragmentShaderYellow;
-	unsigned int shaderProgram, shaderProgramYellow;
-	unsigned int VAO;
-	unsigned int EBO;
+	//Geometry
+	unsigned int VBO{};
+	unsigned int VAO{};
+	unsigned int EBO{};
+	unsigned int VBO2{};
+	unsigned int VAO2{};
 
-	Shader* testShader;
+	Shader* testShader{ nullptr };
 
-	ImGuiIO* io;
+	//ImGui stuff
+	ImGuiIO* io{ nullptr };
+	bool show_demo_window{ true };
+	bool show_another_window{ false };
+	ImVec4 clear_color{ ImVec4(0.45f, 0.55f, 0.60f, 1.00f) };
 
-	bool show_demo_window = true;
-	bool show_another_window = false;
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-	unsigned int VBO2, VAO2;
-
-	bool running = true;
+	
+	//Renderer
+	bool running{ true };
 
 	void initWindow() {
 		if (SDL_Init(SDL_INIT_VIDEO) != 1) {
@@ -119,8 +95,6 @@ private:
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-		
 
 		context = SDL_GL_CreateContext(window);
 		SDL_GL_SetSwapInterval(1); //disable vsync with 0, enable with 1
@@ -243,6 +217,23 @@ private:
 				}
 			}
 		
+		const bool* snapshot = SDL_GetKeyboardState(nullptr);
+
+		const float speed{ 0.01f };
+
+		if (snapshot[79]) {
+			tri1.x += speed;
+		}
+		if (snapshot[80]) {
+			tri1.x -= speed;
+		}
+		if (snapshot[81]) {
+			tri1.y -= speed;
+		}
+		if (snapshot[82]) {
+			tri1.y += speed;
+		}
+
 		//rendering
 		drawFrame();
 		imguiFrame();
@@ -266,33 +257,19 @@ private:
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-
-		float timeValue = SDL_GetTicks()/1000.0f;
-		float greenValue = sin(timeValue * 2.0f * 3.14f * 0.1f) / 4.0f + 0.5f;
-		
-		int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-
-		//glUseProgram(shaderProgram);
-
 		testShader->use();
-		//testShader->setUniform4f("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
-		testShader->setUniform4f("ourColor", clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+		testShader->setUniform4f("ourColor", 0.0f, 0.8f, 0.0f, 1.0f);
+		testShader->setUniform2f("tfPos", tri1.x, tri1.y);
 
-		//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
+		testShader->setUniform4f("ourColor", 0.8f, 0.0f, 0.0f, 1.0f);
+		testShader->setUniform2f("tfPos", tri2.x, tri2.y);
 
-
-
-		glUseProgram(shaderProgramYellow);
 		glBindVertexArray(VAO2);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-
 	}
 
 	void setupGeometry() {
@@ -328,78 +305,6 @@ private:
 		glBindVertexArray(0);
 		
 	}
-
-	void setupVertexShader() {
-		vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-		glCompileShader(vertexShader);
-
-		int success;
-		char infoLog[512];
-		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-		if (!success) {
-			glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-			throwError("Shader failed" + std::string(infoLog));
-		}
-	}
-	void setupFragmentShader() {
-		fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-		glCompileShader(fragmentShader);
-
-		int success;
-		char infoLog[512];
-		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-		if (!success) {
-			glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-			throwError("Shader failed" + std::string(infoLog));
-		}
-
-		fragmentShaderYellow = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragmentShaderYellow, 1, &fragmentShaderSourceYellow, NULL);
-		glCompileShader(fragmentShaderYellow);
-
-		glGetShaderiv(fragmentShaderYellow, GL_COMPILE_STATUS, &success);
-		if (!success) {
-			glGetShaderInfoLog(fragmentShaderYellow, 512, NULL, infoLog);
-			throwError("Shader failed" + std::string(infoLog));
-		}
-	}
-
-	void createShaderProgram() {
-		shaderProgram = glCreateProgram();
-		glAttachShader(shaderProgram, vertexShader);
-		glAttachShader(shaderProgram, fragmentShader);
-		glLinkProgram(shaderProgram);
-
-		int success;
-		char infoLog[512];
-		glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-		if (!success) {
-			glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-			throwError("Shader failed" + std::string(infoLog));
-		}
-
-		//yellow
-		shaderProgramYellow = glCreateProgram();
-		glAttachShader(shaderProgramYellow, vertexShader);
-		glAttachShader(shaderProgramYellow, fragmentShaderYellow);
-		glLinkProgram(shaderProgramYellow);
-
-		glGetProgramiv(shaderProgramYellow, GL_LINK_STATUS, &success);
-		if (!success) {
-			glGetProgramInfoLog(shaderProgramYellow, 512, NULL, infoLog);
-			throwError("Shader failed" + std::string(infoLog));
-		}
-
-		glUseProgram(shaderProgram);
-
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-
-	}
-
-
 };
 
 
