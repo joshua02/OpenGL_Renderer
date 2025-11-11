@@ -17,7 +17,7 @@ public:
     unsigned int ID;
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
-    Shader(const char* vertexPath, const char* fragmentPath)
+    Shader(std::string_view vertexPath, std::string_view fragmentPath)
     {
         // 1. retrieve the vertex/fragment source code from filePath
         std::string vertexCode;
@@ -30,8 +30,8 @@ public:
         try
         {
             // open files
-            vShaderFile.open(vertexPath);
-            fShaderFile.open(fragmentPath);
+            vShaderFile.open(vertexPath.data());
+            fShaderFile.open(fragmentPath.data());
             std::stringstream vShaderStream, fShaderStream;
             // read file's buffer contents into streams
             vShaderStream << vShaderFile.rdbuf();
@@ -92,6 +92,10 @@ public:
     void setFloat(const std::string& name, float value) const
     {
         glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+    }
+    void setUniform3f(const std::string& name, float value1, float value2, float value3) const
+    {
+        glUniform3f(glGetUniformLocation(ID, name.c_str()), value1, value2, value3);
     }
     void setUniform4f(const std::string& name, float value1, float value2, float value3, float value4) const
     {

@@ -24,18 +24,18 @@ file(GLOB IMGUI_SOURCES
 )
 
 # Create executable
-add_executable("Renderer" "src/main.cpp" ${IMGUI_SOURCES})
+add_executable("Renderer" "src/main.cpp" ${IMGUI_SOURCES} "src/polygon.h" "src/polygon.cpp" "src/sprite.h" "src/sprite.cpp" "src/texture.h")
 
 # Macro for resources
 target_compile_definitions("Renderer" PUBLIC RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/")
 
 
 target_link_libraries("Renderer" PRIVATE "SDL3::SDL3" "glm::glm" "opengl32" "glad" "JAWEngine")
-target_include_directories("Renderer" PRIVATE "thirdParty/glad/include")
+target_include_directories("Renderer" PRIVATE "thirdParty/glad/include" "thirdParty/stb_image")
 
 
 # Imgui Example
-add_executable("ImguiExample" "src/imgui_example.cpp" ${IMGUI_SOURCES})
+add_executable("ImguiExample" "src/imgui_example.cpp" ${IMGUI_SOURCES} "src/polygon.h" "src/polygon.cpp" "src/sprite.h" "src/sprite.cpp" "src/texture.h")
 target_link_libraries("ImguiExample" PRIVATE "SDL3::SDL3" "opengl32")
 
 

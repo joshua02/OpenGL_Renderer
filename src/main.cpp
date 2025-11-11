@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 
 #include <glad/glad.h>
 #include <SDL3/SDL.h>
@@ -7,52 +8,49 @@
 #include "backends/imgui_impl_opengl3.h"
 
 #include "shader.h"
+#include "polygon.h"
+#include "sprite.h"
 #include <JAWEngine/vec2.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+#include "texture.h"
+
+using namespace JAW;
+
 const uint32_t WIDTH = 800;
-const uint32_t HEIGHT = 600;
+const uint32_t HEIGHT = 800;
 
 void throwError(std::string error) {
 	throw std::runtime_error(error);
 }
-
-float vertices[] = {
-	-0.1f, 0.0f, 0.0f,
-	-0.3f, 0.0f, 0.0f,
-	-0.2f, 0.2f, 0.0f
-};
-
-float vertices2[] = {
-	0.1f, 0.0f, 0.0f,
-	0.3f, 0.0f, 0.0f,
-	0.2f, 0.2f, 0.0f
-};
-
-unsigned int indices[] = {  // note that we start from 0!
-	0, 1, 3,   // first triangle
-	1, 2, 3    // second triangle
-};
-
-JAW::Vec2 tri1 {0.2f, 0.0f};
-JAW::Vec2 tri2 {0.0f, 0.0f};
-
 
 class Renderer {
 public:
 	void run() {
 		initWindow();
 		
-		setupGeometry();
 		loadShaders();
+		setupGeometry();
+		
 
 		initImGui();
 
+		auto lastFrameTime{ std::chrono::steady_clock::now() };
+
 		while (running) {
-			mainLoop();
+			std::chrono::duration<float, std::milli> dt{std::chrono::steady_clock::now() - lastFrameTime};
+			lastFrameTime = std::chrono::steady_clock::now();
+			float dtSeconds{ dt.count() / 1000.0f };
+
+			mainLoop(dtSeconds);
+			gameLoop(dtSeconds);
 		}
 		
 		cleanup();
 	}
+
 private:
 	//SDL stuff
 	SDL_Window* window{ nullptr };
@@ -66,7 +64,13 @@ private:
 	unsigned int VBO2{};
 	unsigned int VAO2{};
 
-	Shader* testShader{ nullptr };
+	std::unique_ptr<Polygon> square{ nullptr };
+	std::unique_ptr<Polygon> pentagon{ nullptr };
+	std::unique_ptr<Sprite> sprite{ nullptr };
+
+	std::shared_ptr<Shader> testShader{ nullptr };
+	std::shared_ptr<Shader> textureShader{ nullptr };
+	std::shared_ptr<Texture> testTexture{ nullptr };
 
 	//ImGui stuff
 	ImGuiIO* io{ nullptr };
@@ -83,6 +87,10 @@ private:
 			throwError(std::string("SDL_Init Error: ") + SDL_GetError());
 		}
 
+		//4x MSAA
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+
 		window = SDL_CreateWindow(
 			"OpenGL Window",
 			WIDTH,
@@ -95,6 +103,7 @@ private:
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+		
 
 		context = SDL_GL_CreateContext(window);
 		SDL_GL_SetSwapInterval(1); //disable vsync with 0, enable with 1
@@ -105,7 +114,8 @@ private:
 
 		glViewport(0, 0, WIDTH, HEIGHT);
 
-		
+
+		glEnable(GL_MULTISAMPLE);
 	}
 
 	void initImGui() {
@@ -147,17 +157,24 @@ private:
 		if (show_demo_window)
 			ImGui::ShowDemoWindow(&show_demo_window);
 
+		ImGui::Begin("Renderer Settings");
+		static bool vsync = true;
+		ImGui::Checkbox("VSync", &vsync);
+		SDL_GL_SetSwapInterval(vsync);
+		ImGui::End();
+
 		// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
 		{
 			static float f = 0.0f;
 			static int counter = 0;
-			static bool vsync = true;
 
 			ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
 			ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
 			ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
 			ImGui::Checkbox("Another Window", &show_another_window);
+
+			
 
 			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 			ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
@@ -203,7 +220,7 @@ private:
 		}
 	}
 
-	void mainLoop() {
+	void mainLoop(float dt) {
 		//Poll events
 		while (SDL_PollEvent(&event)) {
 			ImGui_ImplSDL3_ProcessEvent(&event);
@@ -214,26 +231,8 @@ private:
 				case SDL_EVENT_WINDOW_RESIZED:
 					glViewport(0, 0, event.window.data1, event.window.data2);
 					break;
-				}
 			}
-		
-		const bool* snapshot = SDL_GetKeyboardState(nullptr);
-
-		const float speed{ 0.01f };
-
-		if (snapshot[79]) {
-			tri1.x += speed;
 		}
-		if (snapshot[80]) {
-			tri1.x -= speed;
-		}
-		if (snapshot[81]) {
-			tri1.y -= speed;
-		}
-		if (snapshot[82]) {
-			tri1.y += speed;
-		}
-
 		//rendering
 		drawFrame();
 		imguiFrame();
@@ -243,6 +242,28 @@ private:
 
 	}
 
+	void gameLoop(float dt) {
+		const bool* snapshot = SDL_GetKeyboardState(nullptr);
+
+		const float speed{ 1.0f };
+
+		Vec2 vel{};
+
+		if (snapshot[79]) {
+			vel.x += 1;
+		}
+		if (snapshot[80]) {
+			vel.x -= 1;
+		}
+		if (snapshot[81]) {
+			vel.y -= 1;
+		}
+		if (snapshot[82]) {
+			vel.y += 1;
+		}
+		sprite->pos += vel.normalize() * speed * dt;
+	}
+
 	void cleanup() {
 		SDL_GL_DestroyContext(context);
 		SDL_DestroyWindow(window);
@@ -250,60 +271,33 @@ private:
 	}
 
 	void loadShaders() {
-		testShader = new Shader(RESOURCES_PATH "shaders/shader.vert", RESOURCES_PATH "shaders/shader.frag");
+		testShader = std::make_shared<Shader>(RESOURCES_PATH "shaders/shader.vert", RESOURCES_PATH "shaders/shader.frag");
+		textureShader = std::make_shared<Shader>(RESOURCES_PATH "shaders/textureShader.vert", RESOURCES_PATH "shaders/textureShader.frag");
+		testTexture = std::make_shared<Texture>(RESOURCES_PATH "images/dog6.jpg");
+	}
+
+	
+
+	void setupGeometry() {
+		square = std::make_unique<Polygon>(4, Vec2{0.5f, 0.0f}, 0.2f);
+		square->shader = testShader;
+
+		pentagon = std::make_unique<Polygon>(100, Vec2{-0.5f, 0.0f}, 0.6f);
+		pentagon->shader = testShader;
+		pentagon->colB = 0.2f;
+
+		sprite = std::make_unique<Sprite>(Vec2{ 0.0f, 0.0f }, Vec2{0.5f, 0.5f});
+		sprite->shader = textureShader;
+		sprite->texture = testTexture;
 	}
 
 	void drawFrame() {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		testShader->use();
-		testShader->setUniform4f("ourColor", 0.0f, 0.8f, 0.0f, 1.0f);
-		testShader->setUniform2f("tfPos", tri1.x, tri1.y);
-
-
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		testShader->setUniform4f("ourColor", 0.8f, 0.0f, 0.0f, 1.0f);
-		testShader->setUniform2f("tfPos", tri2.x, tri2.y);
-
-		glBindVertexArray(VAO2);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-	}
-
-	void setupGeometry() {
-		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);
-		glGenBuffers(1, &EBO);
-
-		glBindVertexArray(VAO);
-
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-		
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-
-		//second vbo
-		glGenVertexArrays(1, &VAO2);
-		glGenBuffers(1, &VBO2);
-		glBindVertexArray(VAO2);
-
-		glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-
-		
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-		
+		square->draw();
+		pentagon->draw();
+		sprite->draw();
 	}
 };
 
@@ -318,8 +312,7 @@ int main() {
 	}
 	catch (std::exception& e) {
 		std::cerr << e.what() << std::endl;
-		return -1;
+		std::exit(1);
 	}
-	return 0;
 }
 
