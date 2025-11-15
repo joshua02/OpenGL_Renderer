@@ -14,6 +14,7 @@
 #include "shader.h"
 #include "polygon.h"
 #include "sprite.h"
+#include "cube.h"
 #include <JAWEngine/vec2.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -69,11 +70,13 @@ private:
 	std::unique_ptr<Polygon> square{ nullptr };
 	std::unique_ptr<Polygon> pentagon{ nullptr };
 	std::unique_ptr<Sprite> sprite{ nullptr };
+	std::unique_ptr<Cube> cube{ nullptr };
 
 	//shaders
 	std::shared_ptr<Shader> testShader{ nullptr };
 	std::shared_ptr<Shader> textureShader{ nullptr };
 	std::shared_ptr<Texture> testTexture{ nullptr };
+	std::shared_ptr<Shader> texturePerspective{ nullptr };
 
 	//ImGui stuff
 	ImGuiIO* io{ nullptr };
@@ -119,6 +122,8 @@ private:
 
 
 		glEnable(GL_MULTISAMPLE);
+		//enable depth buffer
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	void initImGui() {
@@ -248,7 +253,7 @@ private:
 			}
 		}
 		//rendering
-		drawFrame();
+		drawFrame(dt);
 		imguiFrame();
 
 		//swap buffers
@@ -277,16 +282,8 @@ private:
 		}
 		sprite->pos += vel.normalize() * speed * dt;
 
-		static float accTime{};
-		accTime += dt;
-
-		glm::mat4 trans(1.0f);
 		
-		trans = glm::translate(trans, glm::vec3(sprite->pos.x, sprite->pos.y, 0.0f));
-		trans = glm::rotate(trans, glm::radians(accTime * 180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 1.0f));
 
-		sprite->transform = trans;
 	}
 
 	void cleanup() {
@@ -299,6 +296,8 @@ private:
 		testShader = std::make_shared<Shader>(RESOURCES_PATH "shaders/shader.vert", RESOURCES_PATH "shaders/shader.frag");
 		textureShader = std::make_shared<Shader>(RESOURCES_PATH "shaders/textureShader.vert", RESOURCES_PATH "shaders/textureShader.frag");
 		testTexture = std::make_shared<Texture>(RESOURCES_PATH "images/dog6.jpg");
+		texturePerspective = std::make_shared<Shader>(RESOURCES_PATH "shaders/texturePerspective.vert", RESOURCES_PATH "shaders/textureShader.frag");
+
 	}
 
 	
@@ -311,21 +310,46 @@ private:
 		pentagon->shader = testShader;
 		pentagon->colB = 0.2f;
 
-
-
-
 		sprite = std::make_unique<Sprite>(Vec2{ 0.0f, 0.0f }, Vec2{0.5f, 0.5f});
 		sprite->shader = textureShader;
 		sprite->texture = testTexture;
+
+		cube = std::make_unique<Cube>();
+		cube->shader = texturePerspective;
+		cube->texture = testTexture;
+		cube->updateProj(glm::perspective(glm::radians(45.0f), static_cast<float>(WIDTH) / HEIGHT, 0.1f, 100.0f));
+		cube->updateView(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f)));
 	}
 
-	void drawFrame() {
+	void drawFrame(float dt) {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		square->draw();
 		pentagon->draw();
 		sprite->draw();
+
+		static float accTime{};
+		accTime += dt;
+
+		glm::mat4 trans(1.0f);
+
+		trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 1.0f));
+		trans = glm::translate(trans, glm::vec3(sprite->pos.x, sprite->pos.y, 0.0f));
+		trans = glm::rotate(trans, glm::radians(accTime * 180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		//sprite->transform = trans;
+
+		cube->transform = trans;
+		cube->draw();
+
+		glm::mat4 trans2(1.0f);
+
+		trans2 = glm::scale(trans2, glm::vec3(0.5f, 0.5f, 1.0f));
+		trans2 = glm::translate(trans2, glm::vec3(sprite->pos.x, -1 * sprite->pos.y, 0.0f));
+		trans2 = glm::rotate(trans2, glm::radians(accTime * 180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		cube->transform = trans2;
+		cube->draw();
+
 	}
 };
 
