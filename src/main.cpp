@@ -7,6 +7,10 @@
 #include "backends/imgui_impl_sdl3.h"
 #include "backends/imgui_impl_opengl3.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "shader.h"
 #include "polygon.h"
 #include "sprite.h"
@@ -31,6 +35,8 @@ public:
 	void run() {
 		initWindow();
 		
+		otherInit();
+
 		loadShaders();
 		setupGeometry();
 		
@@ -217,6 +223,17 @@ private:
 		}
 	}
 
+	void otherInit() {
+		glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+		glm::mat4 trans = glm::mat4(1.0f);
+		trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+		vec = trans * vec;
+		std::cout << vec.x << vec.y << vec.z << std::endl;
+
+		
+
+	}
+
 	void mainLoop(float dt) {
 		//Poll events
 		while (SDL_PollEvent(&event)) {
@@ -259,6 +276,18 @@ private:
 			vel.y += 1;
 		}
 		sprite->pos += vel.normalize() * speed * dt;
+
+		static float accTime{};
+		accTime += dt;
+
+		glm::mat4 trans(1.0f);
+		
+		trans = glm::translate(trans, glm::vec3(sprite->pos.x, sprite->pos.y, 0.0f));
+		trans = glm::rotate(trans, glm::radians(accTime * 180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 1.0f));
+
+		sprite->transform = trans;
+
 	}
 
 	void cleanup() {
@@ -282,6 +311,9 @@ private:
 		pentagon = std::make_unique<Polygon>(5, Vec2{-0.5f, 0.0f}, 0.6f);
 		pentagon->shader = testShader;
 		pentagon->colB = 0.2f;
+
+
+
 
 		sprite = std::make_unique<Sprite>(Vec2{ 0.0f, 0.0f }, Vec2{0.5f, 0.5f});
 		sprite->shader = textureShader;

@@ -9,11 +9,6 @@
 
 class Texture {
 public:
-
-	~Texture() {
-		std::cout << "Texture destructor called\n";
-	}
-
 	Texture(std::string_view texturePath) {
 		glGenTextures(1, &id);
 		glBindTexture(GL_TEXTURE_2D, id);

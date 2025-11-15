@@ -11,9 +11,11 @@
 #include <glad/glad.h>
 #include <JAWEngine/vec2.h>
 
+#include <glm/glm.hpp>
+
 class Sprite {
 public:
-	Sprite(JAW::Vec2 pos, JAW::Vec2 size) : pos{ pos }, size{ size } {
+	Sprite(JAW::Vec2 pos, JAW::Vec2 size) : pos{ pos }, size{ size }, transform(1.0f) {
 
 		vertices.resize(24);
 		vertices = {
@@ -37,7 +39,7 @@ public:
 	void draw() const {
 		shader->use();
 		//shader->setUniform3f("ourColor", colR, colG, colB);
-		shader->setUniform2f("tfPos", pos.x, pos.y);
+		shader->setUniformMatrix4fv("transform", transform);
 
 		//glActiveTexture(GL_TEXTURE0);
 		texture->use();
@@ -45,16 +47,31 @@ public:
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	}
+
+	void printTransform() const {
+		for (int y = 0; y < 4; y++) {
+			for (int x = 0; x < 4; x++) {
+				std::cout << transform[x][y] << ", ";
+			}
+			std::cout << '\n';
+		}
+		std::cout << '\n';
+	}
+	
 public:
 	std::shared_ptr<Shader> shader{};
 	std::shared_ptr<Texture> texture{};
+	
 	JAW::Vec2 pos{};
 	JAW::Vec2 size{};
 
+	glm::mat4 transform;
 	float colR{};
 	float colG{ 0.8f };
 	float colB{ 0.8f };
 	float colA{ 1.0f };
+
+	
 private:
 	unsigned int VAO{};	//stores vertex attribute data
 	unsigned int VBO{};	//stores vertex data
@@ -86,6 +103,9 @@ private:
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 	}
+
+	
+
 };
 
 
