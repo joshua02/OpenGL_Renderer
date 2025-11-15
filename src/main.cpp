@@ -22,8 +22,8 @@ using namespace JAW;
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 800;
 
-void throwError(std::string error) {
-	throw std::runtime_error(error);
+void throwError(std::string_view error) {
+	throw std::runtime_error(error.data());
 }
 
 class Renderer {
@@ -37,10 +37,12 @@ public:
 
 		initImGui();
 
-		auto lastFrameTime{ std::chrono::steady_clock::now() };
+		using ms = std::chrono::duration<float, std::milli>;
 
+		auto lastFrameTime{ std::chrono::steady_clock::now() };
+		
 		while (running) {
-			std::chrono::duration<float, std::milli> dt{std::chrono::steady_clock::now() - lastFrameTime};
+			ms dt{std::chrono::steady_clock::now() - lastFrameTime};
 			lastFrameTime = std::chrono::steady_clock::now();
 			float dtSeconds{ dt.count() / 1000.0f };
 
@@ -57,17 +59,12 @@ private:
 	SDL_Event event{};
 	SDL_GLContext context{};
 	
-	//Geometry
-	unsigned int VBO{};
-	unsigned int VAO{};
-	unsigned int EBO{};
-	unsigned int VBO2{};
-	unsigned int VAO2{};
-
+	//geometry
 	std::unique_ptr<Polygon> square{ nullptr };
 	std::unique_ptr<Polygon> pentagon{ nullptr };
 	std::unique_ptr<Sprite> sprite{ nullptr };
 
+	//shaders
 	std::shared_ptr<Shader> testShader{ nullptr };
 	std::shared_ptr<Shader> textureShader{ nullptr };
 	std::shared_ptr<Texture> testTexture{ nullptr };
@@ -228,7 +225,7 @@ private:
 				case SDL_EVENT_QUIT:
 					running = false;
 					break;
-				case SDL_EVENT_WINDOW_RESIZED:
+				case SDL_EVENT_WINDOW_RESIZED: //TODO: bug where imgui external window changes this
 					glViewport(0, 0, event.window.data1, event.window.data2);
 					break;
 			}
@@ -282,7 +279,7 @@ private:
 		square = std::make_unique<Polygon>(4, Vec2{0.5f, 0.0f}, 0.2f);
 		square->shader = testShader;
 
-		pentagon = std::make_unique<Polygon>(100, Vec2{-0.5f, 0.0f}, 0.6f);
+		pentagon = std::make_unique<Polygon>(5, Vec2{-0.5f, 0.0f}, 0.6f);
 		pentagon->shader = testShader;
 		pentagon->colB = 0.2f;
 
@@ -310,7 +307,7 @@ int main() {
 	try {
 		renderer.run();
 	}
-	catch (std::exception& e) {
+	catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;
 		std::exit(1);
 	}

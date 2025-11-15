@@ -28,8 +28,6 @@ public:
 			0, 1, 3,
 			1, 2, 3
 		};
-		
-		indicesSize = 6;
 
 		setupGeometry();
 		vertices = {};
@@ -63,7 +61,7 @@ private:
 	unsigned int EBO{};	//stores index data
 	std::vector<float> vertices{};
 	std::vector<unsigned int> indices{};
-	int indicesSize{};
+	int indicesSize{6};
 
 	void setupGeometry() {
 		glGenVertexArrays(1, &VAO);
