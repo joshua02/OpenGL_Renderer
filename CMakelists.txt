@@ -24,7 +24,7 @@ file(GLOB IMGUI_SOURCES
 )
 
 # Create executable
-add_executable("Renderer" "src/main.cpp" ${IMGUI_SOURCES} "src/polygon.h" "src/polygon.cpp" "src/sprite.h" "src/sprite.cpp" "src/texture.h" "src/cube.h")
+add_executable("Renderer" "src/main.cpp" ${IMGUI_SOURCES} "src/polygon.h" "src/polygon.cpp" "src/sprite.h" "src/sprite.cpp" "src/texture.h" "src/cube.h" "src/camera.h")
 
 # Macro for resources
 target_compile_definitions("Renderer" PUBLIC RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/")

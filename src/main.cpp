@@ -15,6 +15,7 @@
 #include "polygon.h"
 #include "sprite.h"
 #include "cube.h"
+#include "camera.h"
 #include <JAWEngine/vec2.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -86,7 +87,9 @@ private:
 
 	
 	//Renderer
+	std::unique_ptr<Camera> camera{ nullptr };
 	bool running{ true };
+	bool mouseCaptured{ false };
 
 	void initWindow() {
 		if (SDL_Init(SDL_INIT_VIDEO) != 1) {
@@ -229,13 +232,6 @@ private:
 	}
 
 	void otherInit() {
-		glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-		glm::mat4 trans = glm::mat4(1.0f);
-		trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-		vec = trans * vec;
-		std::cout << vec.x << vec.y << vec.z << std::endl;
-
-		
 
 	}
 
@@ -249,6 +245,15 @@ private:
 					break;
 				case SDL_EVENT_WINDOW_RESIZED: //TODO: bug where imgui external window changes this
 					glViewport(0, 0, event.window.data1, event.window.data2);
+
+					cube->updateProj(glm::perspective(glm::radians(45.0f), static_cast<float>(event.window.data1) / event.window.data2, 0.1f, 100.0f));
+
+					break;
+				case SDL_EVENT_KEY_DOWN:
+					if (event.key.scancode == SDL_SCANCODE_C) {
+						mouseCaptured = !mouseCaptured;
+						SDL_SetWindowRelativeMouseMode(window, mouseCaptured);
+					}
 					break;
 			}
 		}
@@ -264,25 +269,47 @@ private:
 	void gameLoop(float dt) {
 		const bool* snapshot = SDL_GetKeyboardState(nullptr);
 
-		const float speed{ 1.0f };
+		const float speed{ 4.0f };
 
 		Vec2 vel{};
+		float up{};
 
-		if (snapshot[79]) {
+		if (snapshot[SDL_SCANCODE_D]) {
 			vel.x += 1;
 		}
-		if (snapshot[80]) {
+		if (snapshot[SDL_SCANCODE_A]) {
 			vel.x -= 1;
 		}
-		if (snapshot[81]) {
+		if (snapshot[SDL_SCANCODE_S]) {
 			vel.y -= 1;
 		}
-		if (snapshot[82]) {
+		if (snapshot[SDL_SCANCODE_W]) {
 			vel.y += 1;
 		}
-		sprite->pos += vel.normalize() * speed * dt;
-
+		if (snapshot[SDL_SCANCODE_S]) {
+			vel.y -= 1;
+		}
+		if (snapshot[SDL_SCANCODE_W]) {
+			vel.y += 1;
+		}
+		if (snapshot[SDL_SCANCODE_Q]) {
+			up += 1;
+		}
+		if (snapshot[SDL_SCANCODE_E]) {
+			up -= 1;
+		}
 		
+		vel = vel.normalize().scaleBy(speed * dt);
+		camera->pos += vel.y * camera->front;
+		camera->pos += vel.x * glm::normalize(glm::cross(camera->front, camera->up));
+		//sprite->pos += vel.normalize() * speed * dt;
+		camera->pos += up * speed * dt * glm::normalize(glm::cross(glm::cross(camera->front, camera->up), camera->front));
+		
+		float dx, dy;
+		SDL_GetRelativeMouseState(&dx, &dy);
+		if (mouseCaptured) {
+			camera->updateFPSCamera(dx, dy);
+		}
 
 	}
 
@@ -303,6 +330,9 @@ private:
 	
 
 	void setupGeometry() {
+
+		camera = std::make_unique<Camera>();
+
 		square = std::make_unique<Polygon>(4, Vec2{0.5f, 0.0f}, 0.2f);
 		square->shader = testShader;
 
@@ -332,23 +362,32 @@ private:
 		static float accTime{};
 		accTime += dt;
 
+		const float radius = 3.0f;
+		float camX = std::sinf(accTime) * radius;
+		float camZ = std::cosf(accTime) * radius;
+		glm::mat4 view;
+		view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+		cube->updateView(camera->getView());
+
 		glm::mat4 trans(1.0f);
 
-		trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 1.0f));
+		trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
 		trans = glm::translate(trans, glm::vec3(sprite->pos.x, sprite->pos.y, 0.0f));
-		trans = glm::rotate(trans, glm::radians(accTime * 180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		//sprite->transform = trans;
+		sprite->transform = trans;
+		trans = glm::rotate(trans, glm::radians(accTime * 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		
 
 		cube->transform = trans;
 		cube->draw();
 
-		glm::mat4 trans2(1.0f);
+		//glm::mat4 trans2(1.0f);
 
-		trans2 = glm::scale(trans2, glm::vec3(0.5f, 0.5f, 1.0f));
-		trans2 = glm::translate(trans2, glm::vec3(sprite->pos.x, -1 * sprite->pos.y, 0.0f));
-		trans2 = glm::rotate(trans2, glm::radians(accTime * 180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		cube->transform = trans2;
-		cube->draw();
+		//trans2 = glm::scale(trans2, glm::vec3(0.5f, 0.5f, 0.5f));
+		//trans2 = glm::translate(trans2, glm::vec3(sprite->pos.x, -1 * sprite->pos.y, 0.0f));
+		//trans2 = glm::rotate(trans2, glm::radians(accTime * 180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//cube->transform = trans2;
+		//cube->draw();
 
 	}
 };
