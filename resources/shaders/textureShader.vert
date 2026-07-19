@@ -7,9 +7,10 @@ out vec3 ourColor;
 out vec2 TexCoord;
 
 uniform mat4 transform;
+uniform mat4 proj;
 
 void main() {
-    gl_Position = transform * vec4(aPos, 1.0f);
+    gl_Position = proj * transform * vec4(aPos, 1.0f);
     ourColor = aColor;
     TexCoord = aTexCoord;
 }
