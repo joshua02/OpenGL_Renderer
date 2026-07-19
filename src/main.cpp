@@ -242,8 +242,10 @@ private:
 				case SDL_EVENT_QUIT:
 					running = false;
 					break;
-				case SDL_EVENT_WINDOW_RESIZED: //TODO: bug where imgui external window changes this
-					glViewport(0, 0, event.window.data1, event.window.data2);
+				case SDL_EVENT_WINDOW_RESIZED:
+					if (SDL_GetWindowID(window) == event.window.windowID) {
+						glViewport(0, 0, event.window.data1, event.window.data2);
+					}
 					break;
 			}
 		}
