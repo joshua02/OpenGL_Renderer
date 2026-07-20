@@ -39,6 +39,8 @@ private:
 
 	//Renderer
 	bool running{ true };
+	glm::mat4 projMatrix{};
+	glm::mat4 viewMatrix{ glm::mat4(1.0f) };
 
 	void initWindow(std::uint32_t width = 800, std::uint32_t height = 600);
 	void initImGui();

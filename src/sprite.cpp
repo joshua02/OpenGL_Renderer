@@ -1,11 +1,12 @@
 #include "sprite.h"
 
 
-void Sprite::draw() const {
+void Sprite::draw(glm::mat4 proj, glm::mat4 view) const {
 	shader->use();
 	//shader->setUniform3f("ourColor", colR, colG, colB);
 	shader->setUniformMatrix4fv("transform", transform);
-	//shader->setUniformMatrix4fv("proj", );
+	shader->setUniformMatrix4fv("proj", proj);
+	shader->setUniformMatrix4fv("view", view);
 
 	//glActiveTexture(GL_TEXTURE0);
 	texture->use();

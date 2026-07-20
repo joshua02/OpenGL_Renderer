@@ -31,7 +31,7 @@ public:
 		setupGeometry();
 	}
 
-	void draw() const;
+	void draw(glm::mat4 proj, glm::mat4 view) const;
 
 	void printTransform() const;
 

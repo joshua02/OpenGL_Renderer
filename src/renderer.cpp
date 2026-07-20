@@ -66,7 +66,10 @@ void Renderer::initWindow(std::uint32_t width, std::uint32_t height) {
 	}
 
 	glViewport(0, 0, width, height);
-
+	//projMatrix = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), 0.1f, 100.0f);
+	projMatrix = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
+	viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, -3.0f));
+	//projMatrix = glm::mat4(1.0f);
 
 	glEnable(GL_MULTISAMPLE);
 }
@@ -191,6 +194,8 @@ void Renderer::mainLoop(float dt) {
 		case SDL_EVENT_WINDOW_RESIZED:
 			if (SDL_GetWindowID(window) == event.window.windowID) {
 				glViewport(0, 0, event.window.data1, event.window.data2);
+				projMatrix = glm::ortho(0.0f, static_cast<float>(event.window.data1), 0.0f, static_cast<float>(event.window.data2), 0.1f, 100.0f);
+
 			}
 			break;
 		}
@@ -259,7 +264,7 @@ void Renderer::setupGeometry() {
 	pentagon->shader = testShader;
 	pentagon->colB = 0.2f;
 
-	sprite = std::make_unique<Sprite>(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 0.5f, 0.5f });
+	sprite = std::make_unique<Sprite>(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 400.0f, 400.0f });
 	sprite->shader = textureShader;
 	sprite->texture = testTexture;
 }
@@ -270,5 +275,5 @@ void Renderer::drawFrame() {
 
 	square->draw();
 	pentagon->draw();
-	sprite->draw();
+	sprite->draw(projMatrix, viewMatrix);
 }

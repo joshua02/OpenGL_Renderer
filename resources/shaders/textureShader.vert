@@ -8,9 +8,10 @@ out vec2 TexCoord;
 
 uniform mat4 transform;
 uniform mat4 proj;
+uniform mat4 view;
 
 void main() {
-    gl_Position = proj * transform * vec4(aPos, 1.0f);
+    gl_Position = proj * view * transform * vec4(aPos, 1.0f);
     ourColor = aColor;
     TexCoord = aTexCoord;
 }
