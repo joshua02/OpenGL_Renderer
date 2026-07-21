@@ -1,6 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include <vector>
 #include <memory>
 #include <SDL3/SDL.h>
 #include "imgui.h"
@@ -18,6 +19,11 @@ public:
 	Renderer();
 	void init();
 	void run();
+	void renderLoop(float dt);
+	void cleanup();
+
+	std::vector<Sprite> sprites{};
+	bool running{ true };
 private:
 	//SDL
 	SDL_Window* window{ nullptr };
@@ -25,7 +31,8 @@ private:
 	SDL_GLContext context{};
 
 	//geometry
-	Sprite sprite{ {0.0f, 0.0f}, {400.0f, 400.0f} };
+	
+	Sprite sprite{ {0.0f, 0.0f}, {200.0f, 200.0f} };
 
 	//shaders
 	std::shared_ptr<Shader> testShader{ nullptr };
@@ -36,20 +43,17 @@ private:
 	ImGuiIO* io{ nullptr };
 	bool show_demo_window{ true };
 	bool show_another_window{ false };
-	ImVec4 clear_color{ ImVec4(0.45f, 0.55f, 0.60f, 1.00f) };
+	ImVec4 clear_color{ ImVec4(0.2f, 0.3f, 0.3f, 1.0f) };
 
 	//Renderer
-	bool running{ true };
+	
 	glm::mat4 projMatrix{};
-	glm::mat4 viewMatrix{ glm::mat4(1.0f) };
+	glm::mat4 viewMatrix{};
 
 	void initWindow(std::uint32_t width = 800, std::uint32_t height = 600);
 	void initImGui();
 	void imguiFrame();
-	void otherInit();
-	void renderLoop(float dt);
-	void gameLoop(float dt);
-	void cleanup();
+	
 	void loadShaders();
 	void setupGeometry();
 	void drawFrame();

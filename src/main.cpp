@@ -20,14 +20,14 @@
 #include <stb_image.h>
 
 #include "texture.h"
-#include "renderer.h"
+#include "game.h"
 
 int main() {
-	Renderer renderer{};
+	Game game{};
 
 	try {
-		renderer.init();
-		renderer.run();
+		game.init();
+		game.run();
 	}
 	catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;

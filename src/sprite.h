@@ -21,7 +21,8 @@ public:
 	JAW::Vec2 pos{};
 	JAW::Vec2 size{};
 
-	glm::mat4 transform{};
+	int zIndex{};
+
 	float colR{};
 	float colG{ 0.8f };
 	float colB{ 0.8f };
@@ -38,7 +39,7 @@ private:
 	unsigned int VAO{};	//stores vertex attribute data
 	unsigned int VBO{};	//stores vertex data
 	unsigned int EBO{};	//stores index data
-
+	//TODO: add and inherit from "drawable" object
 	
 
 };

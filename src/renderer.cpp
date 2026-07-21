@@ -16,27 +16,13 @@ Renderer::Renderer() {
 
 void Renderer::init() {
 	initWindow();
-	otherInit();
 	loadShaders();
 	setupGeometry();
 	initImGui();
 }
 
 void Renderer::run() {
-	using ms = std::chrono::duration<float, std::milli>;
-
-	auto lastFrameTime{ std::chrono::steady_clock::now() };
-
-	while (running) {
-		ms dt{ std::chrono::steady_clock::now() - lastFrameTime };
-		lastFrameTime = std::chrono::steady_clock::now();
-		float dtSeconds{ dt.count() / 1000.0f };
-
-		renderLoop(dtSeconds);
-		gameLoop(dtSeconds);
-	}
-
-	cleanup();
+	
 }
 
 void Renderer::initWindow(std::uint32_t width, std::uint32_t height) {
@@ -70,12 +56,13 @@ void Renderer::initWindow(std::uint32_t width, std::uint32_t height) {
 	}
 
 	glViewport(0, 0, width, height);
-	projMatrix = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), 0.1f, 100.0f);
+	projMatrix = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), -100.0f, 100.0f);
 	//projMatrix = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
-	viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, -1.0f));
+	viewMatrix = glm::translate(glm::mat4{1.0f}, glm::vec3(0.0f, 0.0f, -3.0f));
 	//projMatrix = glm::mat4(1.0f);
 
 	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void Renderer::initImGui() {
@@ -180,15 +167,10 @@ void Renderer::imguiFrame() {
 	}
 }
 
-void Renderer::otherInit() {
-	glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-	glm::mat4 trans = glm::mat4(1.0f);
-	trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-	vec = trans * vec;
-}
 
 void Renderer::renderLoop(float dt) {
 	//Poll events
+	//TODO: does it make sense to move this to game class?
 	while (SDL_PollEvent(&event)) {
 		ImGui_ImplSDL3_ProcessEvent(&event);
 		switch (event.type) {
@@ -198,8 +180,7 @@ void Renderer::renderLoop(float dt) {
 		case SDL_EVENT_WINDOW_RESIZED:
 			if (SDL_GetWindowID(window) == event.window.windowID) {
 				glViewport(0, 0, event.window.data1, event.window.data2);
-				projMatrix = glm::ortho(0.0f, static_cast<float>(event.window.data1), 0.0f, static_cast<float>(event.window.data2), 0.1f, 100.0f);
-
+				projMatrix = glm::ortho(0.0f, static_cast<float>(event.window.data1), 0.0f, static_cast<float>(event.window.data2), -100.0f, 100.0f);
 			}
 			break;
 		}
@@ -213,45 +194,12 @@ void Renderer::renderLoop(float dt) {
 
 }
 
-void Renderer::gameLoop(float dt) {
-	const bool* snapshot = SDL_GetKeyboardState(nullptr);
-
-	const float speed{ 100.0f };
-
-	JAW::Vec2 vel{};
-
-	if (snapshot[SDL_SCANCODE_RIGHT]) {
-		vel.x += 1;
-	}
-	if (snapshot[SDL_SCANCODE_LEFT]) {
-		vel.x -= 1;
-	}
-	if (snapshot[SDL_SCANCODE_DOWN]) {
-		vel.y -= 1;
-	}
-	if (snapshot[SDL_SCANCODE_UP]) {
-		vel.y += 1;
-	}
-	sprite.pos += vel.normalize() * speed * dt;
-
-	static float accTime{};
-	accTime += dt;
-
-	glm::mat4 trans(1.0f);
-
-	trans = glm::translate(trans, glm::vec3(sprite.pos.x, sprite.pos.y, 0.0f));
-	trans = glm::rotate(trans, glm::radians(accTime * 180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 1.0f));
-
-	sprite.transform = trans;
-}
-
 void Renderer::cleanup() {
 	SDL_GL_DestroyContext(context);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 }
-
+//TODO: move shader loading to seperate resource loader
 void Renderer::loadShaders() {
 	testShader = std::make_shared<Shader>(RESOURCES_PATH "shaders/shader.vert", RESOURCES_PATH "shaders/shader.frag");
 	textureShader = std::make_shared<Shader>(RESOURCES_PATH "shaders/textureShader.vert", RESOURCES_PATH "shaders/textureShader.frag");
@@ -261,14 +209,25 @@ void Renderer::loadShaders() {
 
 
 void Renderer::setupGeometry() {
-	sprite.setupGeometry();
-	sprite.shader = textureShader;
-	sprite.texture = testTexture;
+	Sprite& spr = sprites.emplace_back(JAW::Vec2{ 400.0f, 400.0f }, JAW::Vec2{ 200.0f, 200.0f });
+	spr.setupGeometry();
+	spr.texture = testTexture;
+	spr.shader = textureShader;
+
+	Sprite& spr2 = sprites.emplace_back(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 200.0f, 200.0f });
+	spr2.setupGeometry();
+	spr2.shader = textureShader;
+	spr2.texture = testTexture;
+	spr2.zIndex = 1;
 }
 
 void Renderer::drawFrame() {
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(clear_color.x, clear_color.y, clear_color.z, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	sprite.draw(projMatrix, viewMatrix);
+	//TODO: change sprites to vector of "drawable" inheriting classes with draw method
+	//TODO: batch drawable objects into a single VBO object and only store offsets
+	for (const Sprite& spr : sprites) {
+		spr.draw(projMatrix, viewMatrix);
+	}
 }
