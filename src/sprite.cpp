@@ -1,5 +1,8 @@
 #include "sprite.h"
 
+Sprite::Sprite(JAW::Vec2 pos, JAW::Vec2 size) : pos{ pos }, size{ size }, transform(1.0f) {
+	//setupGeometry();
+}
 
 void Sprite::draw(glm::mat4 proj, glm::mat4 view) const {
 	shader->use();

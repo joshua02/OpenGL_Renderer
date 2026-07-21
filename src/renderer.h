@@ -11,8 +11,11 @@
 #include "polygon.h"
 #include "sprite.h"
 
+#include <JAWEngine/vec2.h>
+
 class Renderer {
 public:
+	Renderer();
 	void init();
 	void run();
 private:
@@ -22,9 +25,7 @@ private:
 	SDL_GLContext context{};
 
 	//geometry
-	std::unique_ptr<Polygon> square{ nullptr };
-	std::unique_ptr<Polygon> pentagon{ nullptr };
-	std::unique_ptr<Sprite> sprite{ nullptr };
+	Sprite sprite{ {0.0f, 0.0f}, {400.0f, 400.0f} };
 
 	//shaders
 	std::shared_ptr<Shader> testShader{ nullptr };
@@ -46,7 +47,7 @@ private:
 	void initImGui();
 	void imguiFrame();
 	void otherInit();
-	void mainLoop(float dt);
+	void renderLoop(float dt);
 	void gameLoop(float dt);
 	void cleanup();
 	void loadShaders();

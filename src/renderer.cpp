@@ -10,6 +10,10 @@
 
 #include <JAWEngine/vec2.h>
 
+Renderer::Renderer() {
+
+}
+
 void Renderer::init() {
 	initWindow();
 	otherInit();
@@ -28,7 +32,7 @@ void Renderer::run() {
 		lastFrameTime = std::chrono::steady_clock::now();
 		float dtSeconds{ dt.count() / 1000.0f };
 
-		mainLoop(dtSeconds);
+		renderLoop(dtSeconds);
 		gameLoop(dtSeconds);
 	}
 
@@ -66,9 +70,9 @@ void Renderer::initWindow(std::uint32_t width, std::uint32_t height) {
 	}
 
 	glViewport(0, 0, width, height);
-	//projMatrix = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), 0.1f, 100.0f);
-	projMatrix = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
-	viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, -3.0f));
+	projMatrix = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), 0.1f, 100.0f);
+	//projMatrix = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
+	viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, -1.0f));
 	//projMatrix = glm::mat4(1.0f);
 
 	glEnable(GL_MULTISAMPLE);
@@ -183,7 +187,7 @@ void Renderer::otherInit() {
 	vec = trans * vec;
 }
 
-void Renderer::mainLoop(float dt) {
+void Renderer::renderLoop(float dt) {
 	//Poll events
 	while (SDL_PollEvent(&event)) {
 		ImGui_ImplSDL3_ProcessEvent(&event);
@@ -212,34 +216,34 @@ void Renderer::mainLoop(float dt) {
 void Renderer::gameLoop(float dt) {
 	const bool* snapshot = SDL_GetKeyboardState(nullptr);
 
-	const float speed{ 1.0f };
+	const float speed{ 100.0f };
 
 	JAW::Vec2 vel{};
 
-	if (snapshot[79]) {
+	if (snapshot[SDL_SCANCODE_RIGHT]) {
 		vel.x += 1;
 	}
-	if (snapshot[80]) {
+	if (snapshot[SDL_SCANCODE_LEFT]) {
 		vel.x -= 1;
 	}
-	if (snapshot[81]) {
+	if (snapshot[SDL_SCANCODE_DOWN]) {
 		vel.y -= 1;
 	}
-	if (snapshot[82]) {
+	if (snapshot[SDL_SCANCODE_UP]) {
 		vel.y += 1;
 	}
-	sprite->pos += vel.normalize() * speed * dt;
+	sprite.pos += vel.normalize() * speed * dt;
 
 	static float accTime{};
 	accTime += dt;
 
 	glm::mat4 trans(1.0f);
 
-	trans = glm::translate(trans, glm::vec3(sprite->pos.x, sprite->pos.y, 0.0f));
+	trans = glm::translate(trans, glm::vec3(sprite.pos.x, sprite.pos.y, 0.0f));
 	trans = glm::rotate(trans, glm::radians(accTime * 180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 1.0f));
 
-	sprite->transform = trans;
+	sprite.transform = trans;
 }
 
 void Renderer::cleanup() {
@@ -257,23 +261,14 @@ void Renderer::loadShaders() {
 
 
 void Renderer::setupGeometry() {
-	square = std::make_unique<Polygon>(4, JAW::Vec2{ 0.5f, 0.0f }, 0.2f);
-	square->shader = testShader;
-
-	pentagon = std::make_unique<Polygon>(5, JAW::Vec2{ -0.5f, 0.0f }, 0.6f);
-	pentagon->shader = testShader;
-	pentagon->colB = 0.2f;
-
-	sprite = std::make_unique<Sprite>(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 400.0f, 400.0f });
-	sprite->shader = textureShader;
-	sprite->texture = testTexture;
+	sprite.setupGeometry();
+	sprite.shader = textureShader;
+	sprite.texture = testTexture;
 }
 
 void Renderer::drawFrame() {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	square->draw();
-	pentagon->draw();
-	sprite->draw(projMatrix, viewMatrix);
+	sprite.draw(projMatrix, viewMatrix);
 }

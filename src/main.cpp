@@ -22,10 +22,8 @@
 #include "texture.h"
 #include "renderer.h"
 
-using namespace JAW;
-
 int main() {
-	Renderer renderer;
+	Renderer renderer{};
 
 	try {
 		renderer.init();

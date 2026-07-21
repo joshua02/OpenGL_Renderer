@@ -21,33 +21,26 @@ public:
 	JAW::Vec2 pos{};
 	JAW::Vec2 size{};
 
-	glm::mat4 transform;
+	glm::mat4 transform{};
 	float colR{};
 	float colG{ 0.8f };
 	float colB{ 0.8f };
 	float colA{ 1.0f };
 
-	Sprite(JAW::Vec2 pos, JAW::Vec2 size) : pos{ pos }, size{ size }, transform(1.0f) {
-		setupGeometry();
-	}
+	Sprite(JAW::Vec2 pos, JAW::Vec2 size);
 
 	void draw(glm::mat4 proj, glm::mat4 view) const;
 
 	void printTransform() const;
 
+	void setupGeometry();
 private:
 	unsigned int VAO{};	//stores vertex attribute data
 	unsigned int VBO{};	//stores vertex data
 	unsigned int EBO{};	//stores index data
 
-	void setupGeometry();
+	
 
 };
-
-
-
-
-
-
 
 #endif
