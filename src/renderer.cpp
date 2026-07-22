@@ -106,7 +106,7 @@ void Renderer::loadShaders() {
 }
 
 void Renderer::setupGeometry() {
-	Sprite& spr = sprites.emplace_back(JAW::Vec2{ 400.0f, 400.0f }, JAW::Vec2{ 200.0f, 200.0f });
+	Sprite& spr = sprites.emplace_back(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 100.0f, 100.0f });
 	spr.setupGeometry();
 	spr.texture = testTexture;
 	spr.shader = textureShader;

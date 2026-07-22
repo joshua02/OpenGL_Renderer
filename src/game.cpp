@@ -45,11 +45,10 @@ void Game::gameLoop(float dt) {
 	if (snapshot[SDL_SCANCODE_UP]) {
 		vel.y += 1;
 	}
-	renderer.sprites[1].position += vel * speed * dt;
+	renderer.sprites[1].transform.position += vel * speed * dt;
 
 	static float accTime{};
 	accTime += dt;
 
-	//trans = glm::translate(trans, glm::vec3(sprite.pos.x, sprite.pos.y, 0.0f));
-	//trans = glm::rotate(trans, glm::radians(accTime * 180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	renderer.sprites[0].transform.position = glm::vec3{ renderer.imguiMenu.pos[0], renderer.imguiMenu.pos[1], renderer.imguiMenu.pos[2] };
 }

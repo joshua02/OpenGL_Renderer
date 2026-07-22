@@ -21,8 +21,6 @@ public:
 
 	Transform transform{};
 
-	glm::vec3& position{ transform.position };
-
 	JAW::Vec2 pos{};
 	JAW::Vec2 size{};
 

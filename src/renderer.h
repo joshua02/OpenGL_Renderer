@@ -22,17 +22,12 @@ public:
 
 	std::vector<Sprite> sprites{};
 	bool running{ true };
+	ImGuiMenu imguiMenu{};
 private:
 	//SDL
 	SDL_Window* window{ nullptr };
 	SDL_Event event{};
 	SDL_GLContext context{};
-
-	ImGuiMenu imguiMenu{};
-
-	//geometry
-	
-	Sprite sprite{ {0.0f, 0.0f}, {200.0f, 200.0f} };
 
 	//shaders
 	std::shared_ptr<Shader> testShader{ nullptr };
