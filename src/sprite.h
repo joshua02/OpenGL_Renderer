@@ -12,11 +12,16 @@
 #include <JAWEngine/vec2.h>
 
 #include <glm/glm.hpp>
+#include "transform.h"
 
 class Sprite {
 public:
 	std::shared_ptr<Shader> shader{};
 	std::shared_ptr<Texture> texture{};
+
+	Transform transform{};
+
+	glm::vec3& position{ transform.position };
 
 	JAW::Vec2 pos{};
 	JAW::Vec2 size{};

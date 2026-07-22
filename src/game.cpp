@@ -31,7 +31,7 @@ void Game::gameLoop(float dt) {
 
 	const float speed{ 500.0f };
 
-	JAW::Vec2 vel{};
+	glm::vec3 vel{};
 
 	if (snapshot[SDL_SCANCODE_RIGHT]) {
 		vel.x += 1;
@@ -45,7 +45,7 @@ void Game::gameLoop(float dt) {
 	if (snapshot[SDL_SCANCODE_UP]) {
 		vel.y += 1;
 	}
-	renderer.sprites[1].pos += vel.normalize() * speed * dt;
+	renderer.sprites[1].position += vel * speed * dt;
 
 	static float accTime{};
 	accTime += dt;

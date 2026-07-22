@@ -9,12 +9,8 @@ void Sprite::draw(glm::mat4 proj, glm::mat4 view) const {
 	//shader->setUniform3f("ourColor", colR, colG, colB);
 
 	//TODO: wrap glm::mat4 as a transform and updates to pos, scale, etc. modify directly
-	glm::mat4 transform{1.0f};
-	
-	transform = glm::translate(transform, glm::vec3(pos.x, pos.y, zIndex));
 
-
-	shader->setUniformMatrix4fv("transform", transform);
+	shader->setUniformMatrix4fv("transform", transform.mat);
 	shader->setUniformMatrix4fv("proj", proj);
 	shader->setUniformMatrix4fv("view", view);
 
