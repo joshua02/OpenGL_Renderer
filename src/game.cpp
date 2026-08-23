@@ -45,7 +45,8 @@ void Game::gameLoop(float dt) {
 	if (snapshot[SDL_SCANCODE_UP]) {
 		vel.y += 1;
 	}
-	renderer.sprites[1].transform.position += vel * speed * dt;
+	//TODO: refactor so that the sprite is owned by the game class
+	renderer.sprites[2].transform.position += vel * speed * dt;
 
 	static float accTime{};
 	accTime += dt;

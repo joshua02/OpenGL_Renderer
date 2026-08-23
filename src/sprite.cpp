@@ -1,7 +1,8 @@
 #include "sprite.h"
 
-Sprite::Sprite(JAW::Vec2 pos, JAW::Vec2 size) : pos{ pos }, size{ size } {
+Sprite::Sprite(JAW::Vec2 pos, JAW::Vec2 size, int zIndex) : pos{ pos }, size{ size }, zIndex{ zIndex } {
 	//setupGeometry();
+	transform.mat = glm::translate(transform.mat, glm::vec3{ pos.x, pos.y, 0.0f });
 }
 
 void Sprite::draw(glm::mat4 proj, glm::mat4 view) const {
@@ -32,12 +33,13 @@ void Sprite::printTransform() const {
 }
 
 void Sprite::setupGeometry() {
+	float z = static_cast<float>(zIndex);
 	std::array<float, 32> vertices{
 		//positions						//colors			//texture coords
-		-size.x / 2, size.y / 2, 0.0f,	1.0f, 0.0f, 0.0f,	0.0f, 0.0f,
-		-size.x / 2, -size.y / 2, 0.0f,	0.0f, 1.0f, 0.0f,	0.0f, 1.0f,
-		size.x / 2, -size.y / 2, 0.0f,	0.0f, 0.0f, 1.0f,	1.0f, 1.0f,
-		size.x / 2, size.y / 2, 0.0f,	1.0f, 1.0f, 0.0f,	1.0f, 0.0f
+		-size.x / 2, size.y / 2, z,		1.0f, 0.0f, 0.0f,	0.0f, 0.0f,
+		-size.x / 2, -size.y / 2, z,	0.0f, 1.0f, 0.0f,	0.0f, 1.0f,
+		size.x / 2, -size.y / 2, z,		0.0f, 0.0f, 1.0f,	1.0f, 1.0f,
+		size.x / 2, size.y / 2, z,		1.0f, 1.0f, 0.0f,	1.0f, 0.0f
 	};
 	std::array<unsigned int, 6> indices{
 		0, 1, 3,

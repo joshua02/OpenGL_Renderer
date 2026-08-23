@@ -7,9 +7,14 @@
 
 #include <iostream>
 
+enum class TextureFilter {
+	LINEAR,
+	NEAREST
+};
+
 class Texture {
 public:
-	Texture(std::string_view texturePath) {
+	Texture(std::string_view texturePath, TextureFilter filter = TextureFilter::LINEAR) {
 		glGenTextures(1, &id);
 		glBindTexture(GL_TEXTURE_2D, id);
 
@@ -17,7 +22,16 @@ public:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		switch (filter) {
+		case TextureFilter::LINEAR:
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			break;
+		case TextureFilter::NEAREST:
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			break;
+		}
+		
 
 
 		int width{};

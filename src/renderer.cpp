@@ -106,20 +106,27 @@ void Renderer::loadShaders() {
 	textureShader = std::make_shared<Shader>(RESOURCES_PATH "shaders/textureShader.vert", RESOURCES_PATH "shaders/textureShader.frag");
 	testTexture = std::make_shared<Texture>(RESOURCES_PATH "images/dog6.jpg");
 	transparentTexture = std::make_shared<Texture>(RESOURCES_PATH "images/Pikachu.png");
+	pixelTexture = std::make_shared<Texture>(RESOURCES_PATH "images/pixel_test.png", TextureFilter::NEAREST);
 }
 
 void Renderer::setupGeometry() {
-	Sprite& cat = sprites.emplace_back(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 200.0f, 200.0f });
+	
+	Sprite& cat = sprites.emplace_back(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 200.0f, 200.0f }, 0);
 	cat.setupGeometry();
 	cat.shader = textureShader;
 	cat.texture = testTexture;
 
-	Sprite& pika = sprites.emplace_back(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 100.0f, 100.0f });
+	Sprite& pixelArt = sprites.emplace_back(JAW::Vec2{ 300.0f, 300.0f }, JAW::Vec2{ 200.0f, 200.0f }, 10);
+	pixelArt.setupGeometry();
+	pixelArt.texture = pixelTexture;
+	pixelArt.shader = textureShader;
+
+	
+
+	Sprite& pika = sprites.emplace_back(JAW::Vec2{ 300.0f, 300.0f }, JAW::Vec2{ 100.0f, 100.0f }, 20);
 	pika.setupGeometry();
 	pika.texture = transparentTexture;
 	pika.shader = textureShader;
-	pika.zIndex = -1;
-
 	
 }
 

@@ -31,7 +31,7 @@ public:
 	float colB{ 0.8f };
 	float colA{ 1.0f };
 
-	Sprite(JAW::Vec2 pos, JAW::Vec2 size);
+	Sprite(JAW::Vec2 pos, JAW::Vec2 size, int zIndex);
 
 	void draw(glm::mat4 proj, glm::mat4 view) const;
 
