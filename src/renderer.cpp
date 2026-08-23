@@ -1,8 +1,9 @@
 #include "renderer.h"
 
 #include <chrono>
-#include <glad/glad.h>
+#include <algorithm>
 
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -136,7 +137,10 @@ void Renderer::drawFrame() {
 
 	//TODO: change sprites to vector of "drawable" inheriting classes with draw method
 	//TODO: batch drawable objects into a single VBO object and only store offsets
-	//TODO: draw sprites in order based on zIndex
+
+	std::sort(sprites.begin(), sprites.end(), [](const Sprite& a, const Sprite& b) {
+		return a.zIndex < b.zIndex;
+	});
 	for (const Sprite& spr : sprites) {
 		spr.draw(projMatrix, viewMatrix);
 	}
