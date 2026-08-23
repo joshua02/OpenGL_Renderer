@@ -64,6 +64,8 @@ void Renderer::initWindow(std::uint32_t width, std::uint32_t height) {
 
 	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void Renderer::renderLoop(float dt) {
@@ -103,19 +105,22 @@ void Renderer::loadShaders() {
 	testShader = std::make_shared<Shader>(RESOURCES_PATH "shaders/shader.vert", RESOURCES_PATH "shaders/shader.frag");
 	textureShader = std::make_shared<Shader>(RESOURCES_PATH "shaders/textureShader.vert", RESOURCES_PATH "shaders/textureShader.frag");
 	testTexture = std::make_shared<Texture>(RESOURCES_PATH "images/dog6.jpg");
+	transparentTexture = std::make_shared<Texture>(RESOURCES_PATH "images/Pikachu.png");
 }
 
 void Renderer::setupGeometry() {
-	Sprite& spr = sprites.emplace_back(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 100.0f, 100.0f });
-	spr.setupGeometry();
-	spr.texture = testTexture;
-	spr.shader = textureShader;
+	Sprite& cat = sprites.emplace_back(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 200.0f, 200.0f });
+	cat.setupGeometry();
+	cat.shader = textureShader;
+	cat.texture = testTexture;
 
-	Sprite& spr2 = sprites.emplace_back(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 200.0f, 200.0f });
-	spr2.setupGeometry();
-	spr2.shader = textureShader;
-	spr2.texture = testTexture;
-	spr2.zIndex = 1;
+	Sprite& pika = sprites.emplace_back(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 100.0f, 100.0f });
+	pika.setupGeometry();
+	pika.texture = transparentTexture;
+	pika.shader = textureShader;
+	pika.zIndex = -1;
+
+	
 }
 
 void Renderer::drawFrame() {
@@ -124,6 +129,7 @@ void Renderer::drawFrame() {
 
 	//TODO: change sprites to vector of "drawable" inheriting classes with draw method
 	//TODO: batch drawable objects into a single VBO object and only store offsets
+	//TODO: draw sprites in order based on zIndex
 	for (const Sprite& spr : sprites) {
 		spr.draw(projMatrix, viewMatrix);
 	}

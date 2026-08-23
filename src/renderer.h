@@ -33,6 +33,7 @@ private:
 	std::shared_ptr<Shader> testShader{ nullptr };
 	std::shared_ptr<Shader> textureShader{ nullptr };
 	std::shared_ptr<Texture> testTexture{ nullptr };
+	std::shared_ptr<Texture> transparentTexture{ nullptr };
 
 
 
