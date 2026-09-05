@@ -7,6 +7,7 @@
 
 #include "shader.h"
 #include "texture.h"
+#include "scene.h"
 
 #include <glad/glad.h>
 #include <JAWEngine/vec2.h>
@@ -14,36 +15,20 @@
 #include <glm/glm.hpp>
 #include "transform.h"
 
-class Sprite {
+class Sprite : public GameObject, public Drawable {
 public:
-	std::shared_ptr<Shader> shader{};
-	std::shared_ptr<Texture> texture{};
+	Texture* texture{};
 
 	Transform transform{};
-
 	JAW::Vec2 pos{};
 	JAW::Vec2 size{};
-
 	int zIndex{};
-
-	float colR{};
-	float colG{ 0.8f };
-	float colB{ 0.8f };
-	float colA{ 1.0f };
 
 	Sprite(JAW::Vec2 pos, JAW::Vec2 size, int zIndex);
 
-	void draw(glm::mat4 proj, glm::mat4 view) const;
+	void draw(glm::mat4 proj, glm::mat4 view) const override;
 
-	void printTransform() const;
-
-	void setupGeometry();
-private:
-	unsigned int VAO{};	//stores vertex attribute data
-	unsigned int VBO{};	//stores vertex data
-	unsigned int EBO{};	//stores index data
-	//TODO: add and inherit from "drawable" object
-	
+	void setupGeometry() override;
 
 };
 

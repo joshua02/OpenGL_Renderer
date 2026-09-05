@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "renderer.h"
+#include "scene.h"
 
 class Game {
 public:
@@ -10,6 +11,7 @@ public:
 	void gameLoop(float dt);
 private:
 	Renderer renderer{};
+	Scene scene{};
 
 	bool running{ true };
 };

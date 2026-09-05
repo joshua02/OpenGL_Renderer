@@ -17,19 +17,10 @@ void Sprite::draw(glm::mat4 proj, glm::mat4 view) const {
 
 	//glActiveTexture(GL_TEXTURE0);
 	texture->use();
+	//std::cout << "use " << texture->id << "\n";
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
-}
-
-void Sprite::printTransform() const {
-	for (int y = 0; y < 4; y++) {
-		for (int x = 0; x < 4; x++) {
-			//std::cout << transform[x][y] << ", ";
-		}
-		std::cout << '\n';
-	}
-	std::cout << '\n';
 }
 
 void Sprite::setupGeometry() {

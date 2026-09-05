@@ -12,6 +12,8 @@
 
 #include <JAWEngine/vec2.h>
 
+#include "asset_loader.h"
+
 Renderer::Renderer() {
 
 }
@@ -103,11 +105,16 @@ void Renderer::cleanup() {
 }
 //TODO: move shader loading to seperate resource loader
 void Renderer::loadShaders() {
-	testShader = std::make_shared<Shader>(RESOURCES_PATH "shaders/shader.vert", RESOURCES_PATH "shaders/shader.frag");
-	textureShader = std::make_shared<Shader>(RESOURCES_PATH "shaders/textureShader.vert", RESOURCES_PATH "shaders/textureShader.frag");
-	testTexture = std::make_shared<Texture>(RESOURCES_PATH "images/dog6.jpg");
-	transparentTexture = std::make_shared<Texture>(RESOURCES_PATH "images/Pikachu.png");
-	pixelTexture = std::make_shared<Texture>(RESOURCES_PATH "images/pixel_test.png", TextureFilter::NEAREST);
+
+	AssetLoader& assets{ AssetLoader::getInstance() };
+
+	testShader = assets.getShader("shaders/shader.vert", "shaders/shader.frag");
+	textureShader = assets.getShader("shaders/textureShader.vert", "shaders/textureShader.frag");
+	lineShader = assets.getShader("shaders/lineShader.vert", "shaders/lineShader.frag");
+
+	testTexture = assets.getTexture("images/dog6.jpg");
+	transparentTexture = assets.getTexture("images/Pikachu.png");
+	pixelTexture = assets.getTexture("images/pixel_test.png"); //TODO: needs nearest filter
 }
 
 void Renderer::setupGeometry() {
@@ -122,12 +129,23 @@ void Renderer::setupGeometry() {
 	pixelArt.texture = pixelTexture;
 	pixelArt.shader = textureShader;
 
-	
-
 	Sprite& pika = sprites.emplace_back(JAW::Vec2{ 300.0f, 300.0f }, JAW::Vec2{ 100.0f, 100.0f }, 20);
 	pika.setupGeometry();
 	pika.texture = transparentTexture;
 	pika.shader = textureShader;
+
+	for (int i = 0; i < 20; i++) {
+		Line& line = lines.emplace_back();
+		line.width = 3.0f;
+		line.x1 = i*20.0f;
+		line.y1 = 20.0f;
+		line.x2 = i*40.0f;
+		line.y2 = 200.0f;
+		line.colB = i * 0.02f;
+		line.setupGeometry();
+		line.shader = lineShader;
+	}
+	
 	
 }
 
@@ -141,7 +159,11 @@ void Renderer::drawFrame() {
 	std::sort(sprites.begin(), sprites.end(), [](const Sprite& a, const Sprite& b) {
 		return a.zIndex < b.zIndex;
 	});
+	for (const Line& line : lines) {
+		line.draw(projMatrix, viewMatrix);
+	}
 	for (const Sprite& spr : sprites) {
 		spr.draw(projMatrix, viewMatrix);
 	}
+	
 }

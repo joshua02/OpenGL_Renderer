@@ -21,8 +21,12 @@ public:
 	void cleanup();
 
 	std::vector<Sprite> sprites{};
+	std::vector<Line> lines{};
 	bool running{ true };
 	ImGuiMenu imguiMenu{};
+
+
+
 private:
 	//SDL
 	SDL_Window* window{ nullptr };
@@ -30,11 +34,13 @@ private:
 	SDL_GLContext context{};
 
 	//shaders
-	std::shared_ptr<Shader> testShader{ nullptr };
-	std::shared_ptr<Shader> textureShader{ nullptr };
-	std::shared_ptr<Texture> testTexture{ nullptr };
-	std::shared_ptr<Texture> transparentTexture{ nullptr };
-	std::shared_ptr<Texture> pixelTexture{ nullptr };
+	Shader* testShader{ nullptr };
+	Shader* textureShader{ nullptr };
+	Shader* lineShader{ nullptr };
+	Texture* testTexture{ nullptr };
+	Texture* transparentTexture{ nullptr };
+	Texture* pixelTexture{ nullptr };
+	
 
 
 

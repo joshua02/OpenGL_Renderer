@@ -43,17 +43,23 @@ public:
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 		else {
-			throw std::runtime_error("texture file failed to load");
+			throw std::runtime_error("texture file " + std::string{ texturePath } + " failed to load");
 		}
 		stbi_image_free(data);
+		std::cout << "successfully loaded " << texturePath << " at id: " << id << '\n';
 	}
 
 	void use() const {
 		glBindTexture(GL_TEXTURE_2D, id);
 	}
 
+	~Texture() {
+		std::cout << "texture deconstructor\n";
+		glDeleteTextures(1, &id);
+	}
+
 public:
-	unsigned int id{};
+	GLuint id{};
 
 };
 
