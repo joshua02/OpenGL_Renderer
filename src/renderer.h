@@ -9,6 +9,7 @@
 #include "polygon.h"
 #include "sprite.h"
 #include "imgui_menu.h"
+#include "scene.h"
 
 #include <JAWEngine/vec2.h>
 
@@ -22,6 +23,9 @@ public:
 
 	std::vector<Sprite> sprites{};
 	std::vector<Line> lines{};
+
+	std::vector<std::unique_ptr<Drawable>> drawables;
+
 	bool running{ true };
 	ImGuiMenu imguiMenu{};
 

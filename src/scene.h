@@ -17,8 +17,16 @@ public:
 class Drawable {
 public:
 	Shader* shader{ nullptr };
-	virtual void draw(glm::mat4 proj, glm::mat4 view) const = 0;
-	virtual void setupGeometry() = 0;
+	int zIndex{};
+
+	virtual void draw(glm::mat4 proj, glm::mat4 view) const {
+		throw std::runtime_error("Drawable derived class's draw method is not implemented");
+	}
+	virtual void setupGeometry() {
+		throw std::runtime_error("Drawable derived class's draw method is not implemented");
+	}
+	
+	virtual ~Drawable() = default;
 protected:
 	GLuint VAO{};	//stores vertex attribute data
 	GLuint VBO{};	//stores vertex data
@@ -39,7 +47,7 @@ public:
 	float y2{};
 	float width{ 5.0f };
 
-	void draw(glm::mat4 proj, glm::mat4 view) const {
+	void draw(glm::mat4 proj, glm::mat4 view) const override {
 		shader->use();
 		shader->setUniform3f("ourColor", colR, colG, colB);
 
@@ -51,7 +59,7 @@ public:
 		glBindVertexArray(0);
 	}
 
-	void setupGeometry() {
+	void setupGeometry() override {
 
 		//TODO: Use geometry shader to calculate vertices based on x1, y1, x2, y2, and width
 

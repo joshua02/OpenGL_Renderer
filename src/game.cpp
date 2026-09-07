@@ -46,10 +46,10 @@ void Game::gameLoop(float dt) {
 		vel.y += 1;
 	}
 	//TODO: refactor so that the sprite is owned by the game class
-	renderer.sprites[2].transform.position += vel * speed * dt;
+	//renderer.sprites[2].transform.position += vel * speed * dt;
 
 	static float accTime{};
 	accTime += dt;
 
-	renderer.sprites[0].transform.position = glm::vec3{ renderer.imguiMenu.pos[0], renderer.imguiMenu.pos[1], renderer.imguiMenu.pos[2] };
+	//renderer.sprites[0].transform.position = glm::vec3{ renderer.imguiMenu.pos[0], renderer.imguiMenu.pos[1], renderer.imguiMenu.pos[2] };
 }

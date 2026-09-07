@@ -119,31 +119,36 @@ void Renderer::loadShaders() {
 
 void Renderer::setupGeometry() {
 	
-	Sprite& cat = sprites.emplace_back(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 200.0f, 200.0f }, 0);
-	cat.setupGeometry();
-	cat.shader = textureShader;
-	cat.texture = testTexture;
+	//Sprite& cat = sprites.emplace_back(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 200.0f, 200.0f }, 0);
+	std::unique_ptr<Sprite> cat = std::make_unique<Sprite>(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 200.0f, 200.0f }, 0);
+	cat->setupGeometry();
+	cat->shader = textureShader;
+	cat->texture = testTexture;
+	drawables.push_back(std::move(cat));
 
-	Sprite& pixelArt = sprites.emplace_back(JAW::Vec2{ 300.0f, 300.0f }, JAW::Vec2{ 200.0f, 200.0f }, 10);
-	pixelArt.setupGeometry();
-	pixelArt.texture = pixelTexture;
-	pixelArt.shader = textureShader;
+	std::unique_ptr<Sprite> pixelArt = std::make_unique<Sprite>(JAW::Vec2{ 300.0f, 300.0f }, JAW::Vec2{ 200.0f, 200.0f }, 10);
+	pixelArt->setupGeometry();
+	pixelArt->texture = pixelTexture;
+	pixelArt->shader = textureShader;
+	drawables.push_back(std::move(pixelArt));
 
-	Sprite& pika = sprites.emplace_back(JAW::Vec2{ 300.0f, 300.0f }, JAW::Vec2{ 100.0f, 100.0f }, 20);
-	pika.setupGeometry();
-	pika.texture = transparentTexture;
-	pika.shader = textureShader;
+	std::unique_ptr<Sprite> pika = std::make_unique<Sprite>(JAW::Vec2{ 300.0f, 300.0f }, JAW::Vec2{ 100.0f, 100.0f }, 20);
+	pika->setupGeometry();
+	pika->texture = transparentTexture;
+	pika->shader = textureShader;
+	drawables.push_back(std::move(pika));
 
 	for (int i = 0; i < 20; i++) {
-		Line& line = lines.emplace_back();
-		line.width = 3.0f;
-		line.x1 = i*20.0f;
-		line.y1 = 20.0f;
-		line.x2 = i*40.0f;
-		line.y2 = 200.0f;
-		line.colB = i * 0.02f;
-		line.setupGeometry();
-		line.shader = lineShader;
+		std::unique_ptr<Line> line = std::make_unique<Line>();
+		line->width = 3.0f;
+		line->x1 = i*20.0f;
+		line->y1 = 20.0f;
+		line->x2 = i*40.0f;
+		line->y2 = 200.0f;
+		line->colB = i * 0.02f;
+		line->setupGeometry();
+		line->shader = lineShader;
+		drawables.push_back(std::move(line));
 	}
 	
 	
@@ -153,17 +158,24 @@ void Renderer::drawFrame() {
 	glClearColor(imguiMenu.clear_color.x, imguiMenu.clear_color.y, imguiMenu.clear_color.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//TODO: change sprites to vector of "drawable" inheriting classes with draw method
 	//TODO: batch drawable objects into a single VBO object and only store offsets
 
-	std::sort(sprites.begin(), sprites.end(), [](const Sprite& a, const Sprite& b) {
-		return a.zIndex < b.zIndex;
+	//std::sort(sprites.begin(), sprites.end(), [](const Sprite& a, const Sprite& b) {
+	//	return a.zIndex < b.zIndex;
+	//});
+	//for (const Line& line : lines) {
+	//	line.draw(projMatrix, viewMatrix);
+	//}
+	//for (const Sprite& spr : sprites) {
+	//	spr.draw(projMatrix, viewMatrix);
+	//}
+
+	std::sort(drawables.begin(), drawables.end(), [](const auto& a, const auto& b) {
+		return a->zIndex < b->zIndex;
 	});
-	for (const Line& line : lines) {
-		line.draw(projMatrix, viewMatrix);
-	}
-	for (const Sprite& spr : sprites) {
-		spr.draw(projMatrix, viewMatrix);
+
+	for (const std::unique_ptr<Drawable>& drawable : drawables) {
+		drawable->draw(projMatrix, viewMatrix);
 	}
 	
 }
