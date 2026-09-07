@@ -13,7 +13,26 @@
 class GameObject {
 public:
 	GameObject* parent{ nullptr };
-	std::vector<GameObject*> children{};
+	
+	virtual void process(float dt) {};
+
+	void processChildren(float dt) {
+		for (GameObject* go : getChildren()) {
+			go->process(dt);
+			go->processChildren(dt);
+		}
+	}
+
+	void addChild(GameObject* go) {
+		children.push_back(go);
+	}
+
+	std::vector<GameObject*>& getChildren() {
+		return children;
+	}
+
+protected:
+	std::vector<GameObject*> children;
 };
 
 class Drawable {
@@ -122,8 +141,14 @@ private:
 
 class Scene {
 public:
-	GameObject root;
 
+	Scene() : root{std::make_unique<GameObject>()} {}
+
+	GameObject* getRoot() {
+		return root.get();
+	}
+private:
+	std::unique_ptr<GameObject> root;
 };
 
 

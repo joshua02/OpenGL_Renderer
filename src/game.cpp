@@ -1,15 +1,74 @@
 #include "game.h"
 #include "renderer.h"
 
+#include "sprite.h"
+#include "scene.h"
+#include "player_character.h"
+
 #include <chrono>
+#include <thread>
 
 void Game::init() {
 	renderer.init();
+
+	// Register actions
+
+	inputManager.addAction(Action::MoveLeft, {SDL_SCANCODE_A, SDL_SCANCODE_LEFT});
+	inputManager.addAction(Action::MoveRight, { SDL_SCANCODE_D, SDL_SCANCODE_RIGHT });
+	inputManager.addAction(Action::MoveUp, { SDL_SCANCODE_W, SDL_SCANCODE_UP });
+	inputManager.addAction(Action::MoveDown, { SDL_SCANCODE_S, SDL_SCANCODE_DOWN });
+
+	inputManager.printActions();
+
+	// Add sprites to the scene
+
+	AssetLoader& assets{ AssetLoader::getInstance() };
+
+	std::unique_ptr<Sprite> cat = std::make_unique<Sprite>(
+		JAW::Vec2{ 100.0f, 100.0f },
+		JAW::Vec2{ 200.0f, 200.0f },
+		assets.getTexture("images/dog6.jpg"),
+		0
+	);
+	scene.getRoot()->addChild(cat.get());
+	renderer.addDrawable(std::move(cat));
+
+	std::unique_ptr<Sprite> pixelArt = std::make_unique<Sprite>(
+		JAW::Vec2{ 300.0f, 300.0f },
+		JAW::Vec2{ 200.0f, 200.0f },
+		assets.getTexture("images/pixel_test.png"),	//TODO: needs nearest neighbor filter
+		10
+	);
+	scene.getRoot()->addChild(pixelArt.get());
+	renderer.addDrawable(std::move(pixelArt));
+
+	std::unique_ptr<PlayerCharacter> pika = std::make_unique<PlayerCharacter>(
+		JAW::Vec2{ 300.0f, 300.0f },
+		JAW::Vec2{ 100.0f, 100.0f },
+		assets.getTexture("images/Pikachu.png"),
+		20);
+	scene.getRoot()->addChild(pika.get());
+	renderer.addDrawable(std::move(pika));
+	
+	//TODO: create method in scene to add gameobjects and handle adding drawables to renderer
+	//TODO: scene swapping
+	//TODO: allow gameobjects to be child of each other
+
+	// test draw lines
+
+	for (int i = 0; i < 20; i++) {
+		std::unique_ptr<Line> line = std::make_unique<Line>(JAW::Vec2{ i * 20.0f, 20.0f }, JAW::Vec2{ i * 40.0f, 200.0f }, 0);
+		line->width = 3.0f;
+		line->colB = i * 0.02f;
+		renderer.addDrawable(std::move(line));
+	}
+
 }
 
 void Game::run() {
 	//TODO: run render loop and game loop in seperate threads
 	using ms = std::chrono::duration<float, std::milli>;
+	using namespace std::chrono_literals;
 
 	auto lastFrameTime{ std::chrono::steady_clock::now() };
 
@@ -18,8 +77,10 @@ void Game::run() {
 		lastFrameTime = std::chrono::steady_clock::now();
 		float dtSeconds{ dt.count() / 1000.0f };
 
+		inputManager.process();
 		renderer.renderLoop(dtSeconds);
 		gameLoop(dtSeconds);
+		process(dtSeconds);
 		running = renderer.running;
 	}
 
@@ -27,29 +88,14 @@ void Game::run() {
 }
 
 void Game::gameLoop(float dt) {
-	const bool* snapshot = SDL_GetKeyboardState(nullptr);
 
-	const float speed{ 500.0f };
+}
 
-	glm::vec3 vel{};
+// Game objects are processed starting at scene root node and recursively called down to each child
 
-	if (snapshot[SDL_SCANCODE_RIGHT]) {
-		vel.x += 1;
+void Game::process(float dt) {
+	for (GameObject* go : scene.getRoot()->getChildren()) {
+		go->process(dt);
+		go->processChildren(dt);
 	}
-	if (snapshot[SDL_SCANCODE_LEFT]) {
-		vel.x -= 1;
-	}
-	if (snapshot[SDL_SCANCODE_DOWN]) {
-		vel.y -= 1;
-	}
-	if (snapshot[SDL_SCANCODE_UP]) {
-		vel.y += 1;
-	}
-	//TODO: refactor so that the sprite is owned by the game class
-	//renderer.sprites[2].transform.position += vel * speed * dt;
-
-	static float accTime{};
-	accTime += dt;
-
-	//renderer.sprites[0].transform.position = glm::vec3{ renderer.imguiMenu.pos[0], renderer.imguiMenu.pos[1], renderer.imguiMenu.pos[2] };
 }

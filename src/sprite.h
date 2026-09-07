@@ -28,7 +28,7 @@ public:
 
 	void draw(glm::mat4 proj, glm::mat4 view) const override;
 
-private:
+protected:
 	void setupGeometry() override;
 };
 

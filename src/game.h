@@ -3,15 +3,19 @@
 
 #include "renderer.h"
 #include "scene.h"
+#include "input_manager.h"
 
 class Game {
 public:
 	void init();
 	void run();
 	void gameLoop(float dt);
+	void process(float dt);
+
 private:
 	Renderer renderer{};
 	Scene scene{};
+	InputManager& inputManager{InputManager::getInstance()};
 
 	bool running{ true };
 };

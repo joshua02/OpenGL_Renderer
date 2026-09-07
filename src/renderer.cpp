@@ -20,7 +20,6 @@ Renderer::Renderer() {
 
 void Renderer::init() {
 	initWindow();
-	setupGeometry();
 	imguiMenu.imguiInit(window, &context);
 }
 
@@ -101,41 +100,6 @@ void Renderer::cleanup() {
 	SDL_GL_DestroyContext(context);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
-}
-
-void Renderer::setupGeometry() {
-
-	AssetLoader& assets{ AssetLoader::getInstance() };
-
-	std::unique_ptr<Sprite> cat = std::make_unique<Sprite>(
-		JAW::Vec2{ 0.0f, 0.0f },
-		JAW::Vec2{ 200.0f, 200.0f },
-		assets.getTexture("images/dog6.jpg"),
-		0
-	);
-	addDrawable(std::move(cat));
-
-	std::unique_ptr<Sprite> pixelArt = std::make_unique<Sprite>(
-		JAW::Vec2{ 300.0f, 300.0f },
-		JAW::Vec2{ 200.0f, 200.0f },
-		assets.getTexture("images/pixel_test.png"),	//TODO: needs nearest neighbor filter
-		10
-	);
-	addDrawable(std::move(pixelArt));
-
-	std::unique_ptr<Sprite> pika = std::make_unique<Sprite>(
-		JAW::Vec2{ 300.0f, 300.0f },
-		JAW::Vec2{ 100.0f, 100.0f },
-		assets.getTexture("images/Pikachu.png"),
-		20);
-	addDrawable(std::move(pika));
-
-	for (int i = 0; i < 20; i++) {
-		std::unique_ptr<Line> line = std::make_unique<Line>(JAW::Vec2{i*20.0f, 20.0f}, JAW::Vec2{i*40.0f, 200.0f}, 0);
-		line->width = 3.0f;
-		line->colB = i * 0.02f;
-		addDrawable(std::move(line));
-	}
 }
 
 void Renderer::drawFrame() {
