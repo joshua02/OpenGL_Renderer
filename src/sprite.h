@@ -24,12 +24,12 @@ public:
 	JAW::Vec2 size{};
 	int zIndex{};
 
-	Sprite(JAW::Vec2 pos, JAW::Vec2 size, int zIndex);
+	Sprite(JAW::Vec2 pos, JAW::Vec2 size, Texture* texture, int zIndex);
 
 	void draw(glm::mat4 proj, glm::mat4 view) const override;
 
+private:
 	void setupGeometry() override;
-
 };
 
 #endif

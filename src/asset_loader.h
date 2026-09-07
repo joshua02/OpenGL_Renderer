@@ -61,7 +61,7 @@ private:
 			std::forward_as_tuple(RESOURCES_PATH + std::string{vertPath}, RESOURCES_PATH + std::string{fragPath})
 		)};
 
-		std::cout << it->first << " loaded\n";
+		//::cout << it->first << " loaded\n";
 		return &it->second;
 	}
 	Texture* loadTexture(std::string_view texturePath) {
@@ -71,8 +71,8 @@ private:
 			std::forward_as_tuple(std::string{ texturePath }), 
 			std::forward_as_tuple(RESOURCES_PATH + std::string{texturePath})
 		)};
-		std::cout << it->first << " loaded\n";
-		std::cout << "textures map has " << textures.size() << " elements\n";
+		//std::cout << it->first << " loaded\n";
+		//std::cout << "textures map has " << textures.size() << " elements\n";
 		return &it->second;
 	}
 };

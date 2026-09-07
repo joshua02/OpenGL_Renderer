@@ -46,7 +46,7 @@ public:
 			throw std::runtime_error("texture file " + std::string{ texturePath } + " failed to load");
 		}
 		stbi_image_free(data);
-		std::cout << "successfully loaded " << texturePath << " at id: " << id << '\n';
+		//std::cout << "successfully loaded " << texturePath << " at id: " << id << '\n';
 	}
 
 	void use() const {
@@ -54,7 +54,7 @@ public:
 	}
 
 	~Texture() {
-		std::cout << "texture deconstructor\n";
+		//std::cout << "texture deconstructor\n";
 		glDeleteTextures(1, &id);
 	}
 

@@ -7,6 +7,8 @@
 #include <glm/glm.hpp>
 
 #include "shader.h"
+#include "asset_loader.h"
+#include <JAWEngine/vec2.h>
 
 class GameObject {
 public:
@@ -16,6 +18,9 @@ public:
 
 class Drawable {
 public:
+
+	Drawable(int zIndex) : zIndex { zIndex } {};
+
 	Shader* shader{ nullptr };
 	int zIndex{};
 
@@ -35,16 +40,22 @@ protected:
 
 class Line : public Drawable {
 public:
+
+	Line(JAW::Vec2 p1, JAW::Vec2 p2, int zIndex) : p1{ p1 }, p2{ p2 }, Drawable(zIndex) {
+
+		shader = AssetLoader::getInstance().getShader("shaders/lineShader.vert", "shaders/lineShader.frag");
+		setupGeometry();
+	};
+
 	Shader* shader{ nullptr };
 
 	float colR{ 0.5f };
 	float colG{ 0.0f };
 	float colB{ 0.0f };
 
-	float x1{};
-	float y1{};
-	float x2{};
-	float y2{};
+	JAW::Vec2 p1;
+	JAW::Vec2 p2;
+
 	float width{ 5.0f };
 
 	void draw(glm::mat4 proj, glm::mat4 view) const override {
@@ -59,24 +70,25 @@ public:
 		glBindVertexArray(0);
 	}
 
+private:
 	void setupGeometry() override {
 
 		//TODO: Use geometry shader to calculate vertices based on x1, y1, x2, y2, and width
 
-		float mag{ std::powf(std::powf(x2 - x1,2) + std::powf(y2 - y1,2), 0.5f) };
+		float mag{ std::powf(std::powf(p2.x - p1.x,2) + std::powf(p2.y - p1.y,2), 0.5f) };
 
-		float dirX{ (x2 - x1) / mag };
-		float dirY{ (y2 - y1) / mag };
+		float dirX{ (p2.x - p1.x) / mag };
+		float dirY{ (p2.y - p1.y) / mag };
 
 		float normX{ -dirY };
 		float normY{ dirX };
 
 		std::array<float, 32> vertices{
 			//positions
-			x1 + width * normX, y1 + width * normY, 0,
-			x2 + width * normX, y2 + width * normY, 0,
-			x1 - width * normX, y1 - width * normY, 0,
-			x2 - width * normX, y2 - width * normY, 0
+			p1.x + width * normX, p1.y + width * normY, 0,
+			p2.x + width * normX, p2.y + width * normY, 0,
+			p1.x - width * normX, p1.y - width * normY, 0,
+			p2.x - width * normX, p2.y - width * normY, 0
 		};
 		std::array<unsigned int, 6> indices{
 			0, 1, 3,

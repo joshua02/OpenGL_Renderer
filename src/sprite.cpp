@@ -1,8 +1,13 @@
 #include "sprite.h"
+#include "asset_loader.h"
 
-Sprite::Sprite(JAW::Vec2 pos, JAW::Vec2 size, int zIndex) : pos{ pos }, size{ size }, zIndex{ zIndex } {
+Sprite::Sprite(JAW::Vec2 pos, JAW::Vec2 size, Texture* texture, int zIndex) : pos{ pos }, size{ size }, texture{texture}, Drawable(zIndex) {
 	//setupGeometry();
 	transform.mat = glm::translate(transform.mat, glm::vec3{ pos.x, pos.y, zIndex });
+
+	shader = AssetLoader::getInstance().getShader("shaders/textureShader.vert", "shaders/textureShader.frag");
+	
+	setupGeometry();
 }
 
 void Sprite::draw(glm::mat4 proj, glm::mat4 view) const {

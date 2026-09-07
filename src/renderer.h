@@ -24,38 +24,28 @@ public:
 	std::vector<Sprite> sprites{};
 	std::vector<Line> lines{};
 
-	std::vector<std::unique_ptr<Drawable>> drawables;
-
 	bool running{ true };
 	ImGuiMenu imguiMenu{};
 
-
+	void addDrawable(std::unique_ptr<Drawable> drawable) {
+		drawables.push_back(std::move(drawable));
+	}
 
 private:
 	//SDL
 	SDL_Window* window{ nullptr };
 	SDL_Event event{};
 	SDL_GLContext context{};
-
-	//shaders
-	Shader* testShader{ nullptr };
-	Shader* textureShader{ nullptr };
-	Shader* lineShader{ nullptr };
-	Texture* testTexture{ nullptr };
-	Texture* transparentTexture{ nullptr };
-	Texture* pixelTexture{ nullptr };
 	
-
-
-
 	//Renderer
 	
 	glm::mat4 projMatrix{};
 	glm::mat4 viewMatrix{};
 
+	std::vector<std::unique_ptr<Drawable>> drawables;
+
 	void initWindow(std::uint32_t width = 800, std::uint32_t height = 600);
 
-	void loadShaders();
 	void setupGeometry();
 	void drawFrame();
 

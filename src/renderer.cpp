@@ -20,7 +20,6 @@ Renderer::Renderer() {
 
 void Renderer::init() {
 	initWindow();
-	loadShaders();
 	setupGeometry();
 	imguiMenu.imguiInit(window, &context);
 }
@@ -103,55 +102,40 @@ void Renderer::cleanup() {
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 }
-//TODO: move shader loading to seperate resource loader
-void Renderer::loadShaders() {
+
+void Renderer::setupGeometry() {
 
 	AssetLoader& assets{ AssetLoader::getInstance() };
 
-	testShader = assets.getShader("shaders/shader.vert", "shaders/shader.frag");
-	textureShader = assets.getShader("shaders/textureShader.vert", "shaders/textureShader.frag");
-	lineShader = assets.getShader("shaders/lineShader.vert", "shaders/lineShader.frag");
+	std::unique_ptr<Sprite> cat = std::make_unique<Sprite>(
+		JAW::Vec2{ 0.0f, 0.0f },
+		JAW::Vec2{ 200.0f, 200.0f },
+		assets.getTexture("images/dog6.jpg"),
+		0
+	);
+	addDrawable(std::move(cat));
 
-	testTexture = assets.getTexture("images/dog6.jpg");
-	transparentTexture = assets.getTexture("images/Pikachu.png");
-	pixelTexture = assets.getTexture("images/pixel_test.png"); //TODO: needs nearest filter
-}
+	std::unique_ptr<Sprite> pixelArt = std::make_unique<Sprite>(
+		JAW::Vec2{ 300.0f, 300.0f },
+		JAW::Vec2{ 200.0f, 200.0f },
+		assets.getTexture("images/pixel_test.png"),	//TODO: needs nearest neighbor filter
+		10
+	);
+	addDrawable(std::move(pixelArt));
 
-void Renderer::setupGeometry() {
-	
-	//Sprite& cat = sprites.emplace_back(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 200.0f, 200.0f }, 0);
-	std::unique_ptr<Sprite> cat = std::make_unique<Sprite>(JAW::Vec2{ 0.0f, 0.0f }, JAW::Vec2{ 200.0f, 200.0f }, 0);
-	cat->setupGeometry();
-	cat->shader = textureShader;
-	cat->texture = testTexture;
-	drawables.push_back(std::move(cat));
-
-	std::unique_ptr<Sprite> pixelArt = std::make_unique<Sprite>(JAW::Vec2{ 300.0f, 300.0f }, JAW::Vec2{ 200.0f, 200.0f }, 10);
-	pixelArt->setupGeometry();
-	pixelArt->texture = pixelTexture;
-	pixelArt->shader = textureShader;
-	drawables.push_back(std::move(pixelArt));
-
-	std::unique_ptr<Sprite> pika = std::make_unique<Sprite>(JAW::Vec2{ 300.0f, 300.0f }, JAW::Vec2{ 100.0f, 100.0f }, 20);
-	pika->setupGeometry();
-	pika->texture = transparentTexture;
-	pika->shader = textureShader;
-	drawables.push_back(std::move(pika));
+	std::unique_ptr<Sprite> pika = std::make_unique<Sprite>(
+		JAW::Vec2{ 300.0f, 300.0f },
+		JAW::Vec2{ 100.0f, 100.0f },
+		assets.getTexture("images/Pikachu.png"),
+		20);
+	addDrawable(std::move(pika));
 
 	for (int i = 0; i < 20; i++) {
-		std::unique_ptr<Line> line = std::make_unique<Line>();
+		std::unique_ptr<Line> line = std::make_unique<Line>(JAW::Vec2{i*20.0f, 20.0f}, JAW::Vec2{i*40.0f, 200.0f}, 0);
 		line->width = 3.0f;
-		line->x1 = i*20.0f;
-		line->y1 = 20.0f;
-		line->x2 = i*40.0f;
-		line->y2 = 200.0f;
 		line->colB = i * 0.02f;
-		line->setupGeometry();
-		line->shader = lineShader;
-		drawables.push_back(std::move(line));
+		addDrawable(std::move(line));
 	}
-	
-	
 }
 
 void Renderer::drawFrame() {
@@ -159,16 +143,6 @@ void Renderer::drawFrame() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//TODO: batch drawable objects into a single VBO object and only store offsets
-
-	//std::sort(sprites.begin(), sprites.end(), [](const Sprite& a, const Sprite& b) {
-	//	return a.zIndex < b.zIndex;
-	//});
-	//for (const Line& line : lines) {
-	//	line.draw(projMatrix, viewMatrix);
-	//}
-	//for (const Sprite& spr : sprites) {
-	//	spr.draw(projMatrix, viewMatrix);
-	//}
 
 	std::sort(drawables.begin(), drawables.end(), [](const auto& a, const auto& b) {
 		return a->zIndex < b->zIndex;
