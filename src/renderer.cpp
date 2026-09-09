@@ -12,8 +12,6 @@
 
 #include <JAWEngine/vec2.h>
 
-#include "asset_loader.h"
-
 Renderer::Renderer() {
 
 }
@@ -21,10 +19,6 @@ Renderer::Renderer() {
 void Renderer::init() {
 	initWindow();
 	imguiMenu.imguiInit(window, &context);
-}
-
-void Renderer::run() {
-	
 }
 
 void Renderer::initWindow(std::uint32_t width, std::uint32_t height) {
@@ -59,9 +53,7 @@ void Renderer::initWindow(std::uint32_t width, std::uint32_t height) {
 
 	glViewport(0, 0, width, height);
 	projMatrix = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), -100.0f, 100.0f);
-	//projMatrix = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
 	viewMatrix = glm::translate(glm::mat4{1.0f}, glm::vec3(0.0f, 0.0f, -3.0f));
-	//projMatrix = glm::mat4(1.0f);
 
 	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
@@ -108,12 +100,17 @@ void Renderer::drawFrame() {
 
 	//TODO: batch drawable objects into a single VBO object and only store offsets
 
+	//TODO: costly to sort by zIndex every frame?
 	std::sort(drawables.begin(), drawables.end(), [](const auto& a, const auto& b) {
 		return a->zIndex < b->zIndex;
 	});
 
-	for (const std::unique_ptr<Drawable>& drawable : drawables) {
+	for (Drawable* drawable : drawables) {
 		drawable->draw(projMatrix, viewMatrix);
 	}
 	
+}
+
+void Renderer::addDrawable(Drawable* drawable) {
+	drawables.push_back(drawable);
 }

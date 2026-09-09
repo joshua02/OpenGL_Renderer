@@ -7,6 +7,7 @@
 
 #include <SDL3/SDL.h>
 
+//TODO: add mouse events
 
 enum class Action {
 	MoveLeft,

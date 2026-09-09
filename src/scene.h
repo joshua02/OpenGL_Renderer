@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <cmath>
+#include <algorithm>
 
 #include <glm/glm.hpp>
 
@@ -17,22 +18,25 @@ public:
 	virtual void process(float dt) {};
 
 	void processChildren(float dt) {
-		for (GameObject* go : getChildren()) {
+
+		
+
+		for (std::unique_ptr<GameObject>& go : getChildren()) {
 			go->process(dt);
 			go->processChildren(dt);
 		}
 	}
 
-	void addChild(GameObject* go) {
-		children.push_back(go);
+	void addChild(std::unique_ptr<GameObject> go) {
+		children.push_back(std::move(go));
 	}
 
-	std::vector<GameObject*>& getChildren() {
+	std::vector<std::unique_ptr<GameObject>>& getChildren() {
 		return children;
 	}
 
 protected:
-	std::vector<GameObject*> children;
+	std::vector<std::unique_ptr<GameObject>> children;
 };
 
 class Drawable {

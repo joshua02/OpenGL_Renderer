@@ -17,19 +17,13 @@ class Renderer {
 public:
 	Renderer();
 	void init();
-	void run();
 	void renderLoop(float dt);
 	void cleanup();
-
-	std::vector<Sprite> sprites{};
-	std::vector<Line> lines{};
 
 	bool running{ true };
 	ImGuiMenu imguiMenu{};
 
-	void addDrawable(std::unique_ptr<Drawable> drawable) {
-		drawables.push_back(std::move(drawable));
-	}
+	void addDrawable(Drawable* drawable);
 
 private:
 	//SDL
@@ -42,11 +36,9 @@ private:
 	glm::mat4 projMatrix{};
 	glm::mat4 viewMatrix{};
 
-	std::vector<std::unique_ptr<Drawable>> drawables;
+	std::vector<Drawable*> drawables;
 
 	void initWindow(std::uint32_t width = 800, std::uint32_t height = 600);
-
-	void setupGeometry();
 	void drawFrame();
 
 
