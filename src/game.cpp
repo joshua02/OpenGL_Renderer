@@ -13,10 +13,10 @@ void Game::init() {
 
 	// Register actions
 
-	inputManager.addAction(Action::MoveLeft, {SDL_SCANCODE_A, SDL_SCANCODE_LEFT});
-	inputManager.addAction(Action::MoveRight, { SDL_SCANCODE_D, SDL_SCANCODE_RIGHT });
-	inputManager.addAction(Action::MoveUp, { SDL_SCANCODE_W, SDL_SCANCODE_UP });
-	inputManager.addAction(Action::MoveDown, { SDL_SCANCODE_S, SDL_SCANCODE_DOWN });
+	inputManager.setActionKeys(Action::MoveLeft, {SDL_SCANCODE_A, SDL_SCANCODE_LEFT});
+	inputManager.setActionKeys(Action::MoveRight, { SDL_SCANCODE_D, SDL_SCANCODE_RIGHT });
+	inputManager.setActionKeys(Action::MoveUp, { SDL_SCANCODE_W, SDL_SCANCODE_UP });
+	inputManager.setActionKeys(Action::MoveDown, { SDL_SCANCODE_S, SDL_SCANCODE_DOWN });
 
 	inputManager.printActions();
 
