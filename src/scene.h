@@ -64,7 +64,6 @@ public:
 	Line(JAW::Vec2 p1, JAW::Vec2 p2, int zIndex) : p1{ p1 }, p2{ p2 }, Drawable(zIndex) {
 
 		shader = AssetLoader::getInstance().getShader("shaders/lineShader.vert", "shaders/lineShader.frag");
-		setupGeometry();
 	};
 
 	Shader* shader{ nullptr };
@@ -105,10 +104,10 @@ private:
 
 		std::array<float, 32> vertices{
 			//positions
-			p1.x + width * normX, p1.y + width * normY, 0,
-			p2.x + width * normX, p2.y + width * normY, 0,
-			p1.x - width * normX, p1.y - width * normY, 0,
-			p2.x - width * normX, p2.y - width * normY, 0
+			p1.x + width * normX, p1.y + width * normY, zIndex,
+			p2.x + width * normX, p2.y + width * normY, zIndex,
+			p1.x - width * normX, p1.y - width * normY, zIndex,
+			p2.x - width * normX, p2.y - width * normY, zIndex
 		};
 		std::array<unsigned int, 6> indices{
 			0, 1, 3,

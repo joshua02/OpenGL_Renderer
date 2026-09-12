@@ -4,6 +4,7 @@
 #include "sprite.h"
 #include "scene.h"
 #include "player_character.h"
+#include "canvas.h"
 
 #include <chrono>
 #include <thread>
@@ -28,7 +29,7 @@ void Game::init() {
 		JAW::Vec2{ 100.0f, 100.0f },
 		JAW::Vec2{ 200.0f, 200.0f },
 		assets.getTexture("images/dog6.jpg"),
-		0
+		5
 	);
 	scene.getRoot()->addChild(std::move(cat));
 
@@ -46,20 +47,23 @@ void Game::init() {
 		assets.getTexture("images/Pikachu.png"),
 		20);
 	scene.getRoot()->addChild(std::move(pika));
+
+	
 	
 	//TODO: scene swapping
 	//TODO: add dummy game object to hold lines, renderer holds list of pointers, so object needs to persist
 	//TODO: handle deleting objects, need to make sure renderer doesn't try to dereference pointer after deletion
 
 	// test draw lines
+	std::unique_ptr<Canvas> canvas{ std::make_unique<Canvas>() };
 
-	//for (int i = 0; i < 20; i++) {
-	//	Line* line = new Line{ JAW::Vec2{ i * 20.0f, 20.0f }, JAW::Vec2{ i * 40.0f, 200.0f }, 0 };
-	//	line->width = 3.0f;
-	//	line->colB = i * 0.02f;
-	//	renderer.addDrawable(line);
-	//}
-
+	for (int i = 0; i < 20; i++) {
+		std::unique_ptr<Line> line = std::make_unique<Line>( JAW::Vec2{ i * 20.0f, 20.0f }, JAW::Vec2{ i * 40.0f, 600.0f }, i );
+		line->width = 3.0f;
+		line->colB = i * 0.02f;
+		canvas->addDrawable(std::move(line));
+	}
+	scene.getRoot()->addChild(std::move(canvas));
 }
 
 void Game::run() {

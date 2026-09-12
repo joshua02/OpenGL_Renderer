@@ -9,7 +9,6 @@ class Game {
 public:
 	void init();
 	void run();
-	void gameLoop(float dt);
 	void process(float dt);
 
 private:
