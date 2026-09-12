@@ -112,5 +112,6 @@ void Renderer::drawFrame() {
 }
 
 void Renderer::addDrawable(Drawable* drawable) {
+	drawable->setupGeometry();
 	drawables.push_back(drawable);
 }

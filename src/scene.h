@@ -18,9 +18,6 @@ public:
 	virtual void process(float dt) {};
 
 	void processChildren(float dt) {
-
-		
-
 		for (std::unique_ptr<GameObject>& go : getChildren()) {
 			go->process(dt);
 			go->processChildren(dt);

@@ -1,65 +1,18 @@
 #include "sprite.h"
 #include "asset_loader.h"
+#include "renderer.h"
 
-Sprite::Sprite(JAW::Vec2 pos, JAW::Vec2 size, Texture* texture, int zIndex) : pos{ pos }, size{ size }, texture{texture}, Drawable(zIndex) {
-	//setupGeometry();
+Sprite::Sprite(JAW::Vec2 pos, JAW::Vec2 size, Texture* texture, int zIndex) : pos{ pos }, size{ size }, texture{ texture }, rendererQuad{ transform, this->texture, size, this->zIndex } {
+
+	rendererQuad.shader = AssetLoader::getInstance().getShader("shaders/textureShader.vert", "shaders/textureShader.frag");
+
 	transform.mat = glm::translate(transform.mat, glm::vec3{ pos.x, pos.y, zIndex });
 
-	shader = AssetLoader::getInstance().getShader("shaders/textureShader.vert", "shaders/textureShader.frag");
-	
-	setupGeometry();
+	Renderer::getInstance().addDrawable(&rendererQuad);
+
 }
 
-void Sprite::draw(glm::mat4 proj, glm::mat4 view) const {
-	shader->use();
-	//shader->setUniform3f("ourColor", colR, colG, colB);
+Sprite::~Sprite() {
 
-	//TODO: wrap glm::mat4 as a transform and updates to pos, scale, etc. modify directly
-
-	shader->setUniformMatrix4fv("transform", transform.mat);
-	shader->setUniformMatrix4fv("proj", proj);
-	shader->setUniformMatrix4fv("view", view);
-
-	//glActiveTexture(GL_TEXTURE0);
-	texture->use();
-	//std::cout << "use " << texture->id << "\n";
-	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
 }
 
-void Sprite::setupGeometry() {
-	std::array<float, 32> vertices{
-		//positions						//colors			//texture coords
-		-size.x / 2, size.y / 2, 0,		1.0f, 0.0f, 0.0f,	0.0f, 0.0f,
-		-size.x / 2, -size.y / 2, 0,	0.0f, 1.0f, 0.0f,	0.0f, 1.0f,
-		size.x / 2, -size.y / 2, 0,		0.0f, 0.0f, 1.0f,	1.0f, 1.0f,
-		size.x / 2, size.y / 2, 0,		1.0f, 1.0f, 0.0f,	1.0f, 0.0f
-	};
-	std::array<unsigned int, 6> indices{
-		0, 1, 3,
-		1, 2, 3
-	};
-
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
-
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(float) * indices.size(), indices.data(), GL_STATIC_DRAW);
-
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-}

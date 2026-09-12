@@ -25,6 +25,12 @@ public:
 
 	void addDrawable(Drawable* drawable);
 
+	static Renderer& getInstance() {
+		static Renderer instance{};
+
+		return instance;
+	}
+
 private:
 	//SDL
 	SDL_Window* window{ nullptr };

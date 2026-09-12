@@ -13,7 +13,7 @@ public:
 	void process(float dt);
 
 private:
-	Renderer renderer{};
+	Renderer& renderer{Renderer::getInstance()};
 	Scene scene{};
 	InputManager& inputManager{InputManager::getInstance()};
 

@@ -14,8 +14,9 @@
 
 #include <glm/glm.hpp>
 #include "transform.h"
+#include "textured_quad.h"
 
-class Sprite : public GameObject, public Drawable {
+class Sprite : public GameObject {
 public:
 	Texture* texture{};
 
@@ -24,12 +25,10 @@ public:
 	JAW::Vec2 size{};
 	int zIndex{};
 
+	TexturedQuad rendererQuad;
+
 	Sprite(JAW::Vec2 pos, JAW::Vec2 size, Texture* texture, int zIndex);
-
-	void draw(glm::mat4 proj, glm::mat4 view) const override;
-
-protected:
-	void setupGeometry() override;
+	~Sprite();
 };
 
 #endif

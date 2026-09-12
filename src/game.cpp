@@ -30,9 +30,7 @@ void Game::init() {
 		assets.getTexture("images/dog6.jpg"),
 		0
 	);
-	renderer.addDrawable(cat.get());
 	scene.getRoot()->addChild(std::move(cat));
-	
 
 	std::unique_ptr<Sprite> pixelArt = std::make_unique<Sprite>(
 		JAW::Vec2{ 300.0f, 300.0f },
@@ -40,7 +38,6 @@ void Game::init() {
 		assets.getTexture("images/pixel_test.png"),	//TODO: needs nearest neighbor filter
 		10
 	);
-	renderer.addDrawable(pixelArt.get());
 	scene.getRoot()->addChild(std::move(pixelArt));
 
 	std::unique_ptr<PlayerCharacter> pika = std::make_unique<PlayerCharacter>(
@@ -48,10 +45,8 @@ void Game::init() {
 		JAW::Vec2{ 100.0f, 100.0f },
 		assets.getTexture("images/Pikachu.png"),
 		20);
-	renderer.addDrawable(pika.get());
 	scene.getRoot()->addChild(std::move(pika));
 	
-	//TODO: create method in scene to add gameobjects and handle adding drawables to renderer
 	//TODO: scene swapping
 	//TODO: add dummy game object to hold lines, renderer holds list of pointers, so object needs to persist
 	//TODO: handle deleting objects, need to make sure renderer doesn't try to dereference pointer after deletion
@@ -59,10 +54,10 @@ void Game::init() {
 	// test draw lines
 
 	//for (int i = 0; i < 20; i++) {
-	//	Line line{ JAW::Vec2{ i * 20.0f, 20.0f }, JAW::Vec2{ i * 40.0f, 200.0f }, 0 };
-	//	line.width = 3.0f;
-	//	line.colB = i * 0.02f;
-	//	renderer.addDrawable(&line);
+	//	Line* line = new Line{ JAW::Vec2{ i * 20.0f, 20.0f }, JAW::Vec2{ i * 40.0f, 200.0f }, 0 };
+	//	line->width = 3.0f;
+	//	line->colB = i * 0.02f;
+	//	renderer.addDrawable(line);
 	//}
 
 }
@@ -81,16 +76,11 @@ void Game::run() {
 
 		inputManager.process();
 		renderer.renderLoop(dtSeconds);
-		gameLoop(dtSeconds);
 		process(dtSeconds);
 		running = renderer.running;
 	}
 
 	renderer.cleanup();
-}
-
-void Game::gameLoop(float dt) {
-
 }
 
 // Game objects are processed starting at scene root node and recursively called down to each child
