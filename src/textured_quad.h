@@ -11,7 +11,7 @@
 
 class TexturedQuad : public Drawable {
 public:
-	TexturedQuad(Transform* tf, Texture* texture, int& zIndex) : transform{ tf }, texture{ texture }, Drawable{ zIndex } {}
+	TexturedQuad(Transform* tf, Texture* texture, int& zIndex) : transform{ tf }, texture{ texture }, Drawable{ zIndex, Drawable::TRANSPARENT } {}
 
 	Transform* transform;
 	Texture* texture;

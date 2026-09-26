@@ -43,6 +43,7 @@ private:
 	glm::mat4 viewMatrix{};
 
 	std::vector<Drawable*> drawables;
+	std::vector<Drawable*> opaqueDrawables;
 
 	void initWindow(std::uint32_t width = 800, std::uint32_t height = 600);
 	void drawFrame();

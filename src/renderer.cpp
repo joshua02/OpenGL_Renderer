@@ -100,11 +100,12 @@ void Renderer::drawFrame() {
 
 	//TODO: batch drawable objects into a single VBO object and only store offsets
 
-	//TODO: costly to sort by zIndex every frame?
-	std::sort(drawables.begin(), drawables.end(), [](const auto& a, const auto& b) {
-		return a->zIndex < b->zIndex;
-	});
+	// Draw all opaque objects first
+	for (Drawable* drawable : opaqueDrawables) {
+		drawable->draw(projMatrix, viewMatrix);
+	}
 
+	//Draw transparent objects, should already be sorted based on zIndex
 	for (Drawable* drawable : drawables) {
 		drawable->draw(projMatrix, viewMatrix);
 	}
@@ -113,5 +114,16 @@ void Renderer::drawFrame() {
 
 void Renderer::addDrawable(Drawable* drawable) {
 	drawable->setupGeometry();
-	drawables.push_back(drawable);
+	if (drawable->opaque) {
+		std::cout << "added opaque object\n";
+		opaqueDrawables.push_back(drawable);
+	}
+	else {
+		std::cout << "added transparent object\n";
+		drawables.push_back(drawable);
+		//TODO: replace vector data structure with structured one so inserting automatically sorts
+		std::sort(drawables.begin(), drawables.end(), [](const auto& a, const auto& b) {
+			return a->zIndex < b->zIndex;
+		});
+	}
 }

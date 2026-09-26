@@ -39,10 +39,16 @@ protected:
 class Drawable {
 public:
 
-	Drawable(int zIndex) : zIndex { zIndex } {};
+	enum {
+		TRANSPARENT,
+		OPAQUE
+	};
+
+	Drawable(int zIndex, bool opaque) : zIndex{ zIndex }, opaque{ opaque } {};
 
 	Shader* shader{ nullptr };
 	int zIndex{};
+	bool opaque{};
 
 	virtual void draw(glm::mat4 proj, glm::mat4 view) const {
 		throw std::runtime_error("Drawable derived class's draw method is not implemented");
@@ -61,7 +67,7 @@ protected:
 class Line : public Drawable {
 public:
 
-	Line(JAW::Vec2 p1, JAW::Vec2 p2, int zIndex) : p1{ p1 }, p2{ p2 }, Drawable(zIndex) {
+	Line(JAW::Vec2 p1, JAW::Vec2 p2, int zIndex) : p1{ p1 }, p2{ p2 }, Drawable(zIndex, Drawable::OPAQUE) {
 
 		shader = AssetLoader::getInstance().getShader("shaders/lineShader.vert", "shaders/lineShader.frag");
 	};
