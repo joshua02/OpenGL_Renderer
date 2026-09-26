@@ -106,8 +106,8 @@ void Renderer::drawFrame() {
 	}
 
 	//Draw transparent objects, should already be sorted based on zIndex
-	for (Drawable* drawable : drawables) {
-		drawable->draw(projMatrix, viewMatrix);
+	for (auto it{ drawables.begin() }; it != drawables.end(); ++it) {
+		it->second->draw(projMatrix, viewMatrix);
 	}
 	
 }
@@ -115,15 +115,9 @@ void Renderer::drawFrame() {
 void Renderer::addDrawable(Drawable* drawable) {
 	drawable->setupGeometry();
 	if (drawable->opaque) {
-		std::cout << "added opaque object\n";
 		opaqueDrawables.push_back(drawable);
 	}
 	else {
-		std::cout << "added transparent object\n";
-		drawables.push_back(drawable);
-		//TODO: replace vector data structure with structured one so inserting automatically sorts
-		std::sort(drawables.begin(), drawables.end(), [](const auto& a, const auto& b) {
-			return a->zIndex < b->zIndex;
-		});
+		drawables.insert(std::make_pair(drawable->zIndex, drawable));
 	}
 }
