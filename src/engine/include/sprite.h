@@ -10,7 +10,7 @@
 #include "scene.h"
 
 #include <glad/glad.h>
-#include <JAWEngine/vec2.h>
+#include "vec2.h"
 
 #include <glm/glm.hpp>
 #include "transform.h"
@@ -21,13 +21,13 @@ public:
 	Texture* texture{};
 
 	Transform transform{};
-	JAW::Vec2 pos{};
-	JAW::Vec2 size{};
+	Vec2 pos{};
+	Vec2 size{};
 	int zIndex{};
 
 	TexturedQuad rendererQuad;
 
-	Sprite(JAW::Vec2 pos, JAW::Vec2 size, Texture* texture, int zIndex);
+	Sprite(Vec2 pos, Vec2 size, Texture* texture, int zIndex);
 	~Sprite();
 };
 

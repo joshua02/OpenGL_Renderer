@@ -4,20 +4,20 @@
 #include "sprite.h"
 #include "input_manager.h"
 
-#include <JAWEngine/vec2.h>
+#include "vec2.h"
 
 #include <numbers>
 
 class PlayerCharacter : public Sprite {
 public:
-	PlayerCharacter(JAW::Vec2 pos, JAW::Vec2 size, Texture* texture, int zIndex) : Sprite(pos, size, texture, zIndex) {}
+	PlayerCharacter(Vec2 pos, Vec2 size, Texture* texture, int zIndex) : Sprite(pos, size, texture, zIndex) {}
 	
 	float speed{ 500.0f };
 
 	void process(float dt) override {
 		InputManager& input{ InputManager::getInstance() };
 
-		JAW::Vec2 vel{};
+		Vec2 vel{};
 
 		if (input.actionIsPressed(Action::MoveLeft)) {
 			vel.x += -1;

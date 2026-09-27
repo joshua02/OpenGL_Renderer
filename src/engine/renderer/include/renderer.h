@@ -7,12 +7,11 @@
 #include <SDL3/SDL.h>
 
 #include "shader.h"
-#include "polygon.h"
 #include "sprite.h"
 #include "imgui_menu.h"
 #include "scene.h"
 
-#include <JAWEngine/vec2.h>
+#include "vec2.h"
 
 class Renderer {
 public:

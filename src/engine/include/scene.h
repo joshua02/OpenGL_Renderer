@@ -9,7 +9,7 @@
 
 #include "shader.h"
 #include "asset_loader.h"
-#include <JAWEngine/vec2.h>
+#include "vec2.h"
 
 class GameObject {
 public:
@@ -67,7 +67,7 @@ protected:
 class Line : public Drawable {
 public:
 
-	Line(JAW::Vec2 p1, JAW::Vec2 p2, int zIndex) : p1{ p1 }, p2{ p2 }, Drawable(zIndex, Drawable::OPAQUE) {
+	Line(Vec2 p1, Vec2 p2, int zIndex) : p1{ p1 }, p2{ p2 }, Drawable(zIndex, Drawable::OPAQUE) {
 
 		shader = AssetLoader::getInstance().getShader("shaders/lineShader.vert", "shaders/lineShader.frag");
 	};
@@ -78,8 +78,8 @@ public:
 	float colG{ 0.0f };
 	float colB{ 0.0f };
 
-	JAW::Vec2 p1;
-	JAW::Vec2 p2;
+	Vec2 p1;
+	Vec2 p2;
 
 	float width{ 5.0f };
 

@@ -2,7 +2,7 @@
 #include "asset_loader.h"
 #include "renderer.h"
 
-Sprite::Sprite(JAW::Vec2 pos, JAW::Vec2 size, Texture* texture, int zIndex) : pos{ pos }, size{ size }, texture{ texture }, rendererQuad{ &transform, this->texture, this->zIndex } {
+Sprite::Sprite(Vec2 pos, Vec2 size, Texture* texture, int zIndex) : pos{ pos }, size{ size }, texture{ texture }, rendererQuad{ &transform, this->texture, this->zIndex } {
 
 	rendererQuad.shader = AssetLoader::getInstance().getShader("shaders/textureShader.vert", "shaders/textureShader.frag");
 

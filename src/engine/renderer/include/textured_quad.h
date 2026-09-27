@@ -4,7 +4,7 @@
 
 #include <glm/glm.hpp>
 #include <glad/glad.h>
-#include <JAWEngine/vec2.h>
+#include "vec2.h"
 
 #include "scene.h"
 #include "transform.h"

@@ -26,24 +26,24 @@ void Game::init() {
 	AssetLoader& assets{ AssetLoader::getInstance() };
 
 	std::unique_ptr<Sprite> cat = std::make_unique<Sprite>(
-		JAW::Vec2{ 100.0f, 100.0f },
-		JAW::Vec2{ 200.0f, 200.0f },
+		Vec2{ 100.0f, 100.0f },
+		Vec2{ 200.0f, 200.0f },
 		assets.getTexture("images/dog6.jpg"),
 		5
 	);
 	scene.getRoot()->addChild(std::move(cat));
 
 	std::unique_ptr<Sprite> pixelArt = std::make_unique<Sprite>(
-		JAW::Vec2{ 300.0f, 300.0f },
-		JAW::Vec2{ 200.0f, 200.0f },
+		Vec2{ 300.0f, 300.0f },
+		Vec2{ 200.0f, 200.0f },
 		assets.getTexture("images/pixel_test.png"),	//TODO: needs nearest neighbor filter
 		10
 	);
 	scene.getRoot()->addChild(std::move(pixelArt));
 
 	std::unique_ptr<PlayerCharacter> pika = std::make_unique<PlayerCharacter>(
-		JAW::Vec2{ 300.0f, 300.0f },
-		JAW::Vec2{ 100.0f, 100.0f },
+		Vec2{ 300.0f, 300.0f },
+		Vec2{ 100.0f, 100.0f },
 		assets.getTexture("images/Pikachu.png"),
 		20);
 	scene.getRoot()->addChild(std::move(pika));
@@ -58,7 +58,7 @@ void Game::init() {
 	std::unique_ptr<Canvas> canvas{ std::make_unique<Canvas>() };
 
 	for (int i = 0; i < 20; i++) {
-		std::unique_ptr<Line> line = std::make_unique<Line>( JAW::Vec2{ i * 20.0f, 20.0f }, JAW::Vec2{ i * 40.0f, 600.0f }, i );
+		std::unique_ptr<Line> line = std::make_unique<Line>( Vec2{ i * 20.0f, 20.0f }, Vec2{ i * 40.0f, 600.0f }, i );
 		line->width = 3.0f;
 		line->colB = i * 0.02f;
 		canvas->addDrawable(std::move(line));

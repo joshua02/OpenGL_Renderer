@@ -12,9 +12,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "shader.h"
-#include "polygon.h"
 #include "sprite.h"
-#include <JAWEngine/vec2.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>

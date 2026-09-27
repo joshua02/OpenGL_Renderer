@@ -10,7 +10,7 @@
 
 #include "imgui_menu.h"
 
-#include <JAWEngine/vec2.h>
+#include "vec2.h"
 
 Renderer::Renderer() {
 

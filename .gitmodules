@@ -8,6 +8,3 @@
 	path = thirdParty/imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
-[submodule "firstParty/Engine"]
-	path = firstParty/Engine
-	url = https://github.com/joshua02/JAWEngine.git

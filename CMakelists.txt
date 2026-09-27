@@ -10,8 +10,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 add_subdirectory("thirdParty/SDL3" EXCLUDE_FROM_ALL)
 add_subdirectory("thirdParty/glm" EXCLUDE_FROM_ALL)
 add_subdirectory("thirdParty/glad" EXCLUDE_FROM_ALL)
-add_subdirectory("firstParty/Engine" EXCLUDE_FROM_ALL)
-
 
 include_directories("thirdParty/imgui")
 include_directories("thirdParty/stb")
@@ -23,15 +21,23 @@ file(GLOB IMGUI_SOURCES
     "${CMAKE_SOURCE_DIR}/thirdParty/imgui/backends/imgui_impl_opengl3.cpp"
 )
 
+file(GLOB RENDERER_SOURCES CONFIGURE_DEPENDS
+    "src/engine/*.cpp"
+    "src/engine/renderer/*.cpp"
+    "src/engine/services/*.cpp"
+    "src/game/*.cpp"
+)
+
 # Create executable
-add_executable("Renderer" "src/main.cpp" ${IMGUI_SOURCES} "src/polygon.h" "src/polygon.cpp" "src/sprite.h" "src/sprite.cpp" "src/texture.h" "src/renderer.cpp" "src/renderer.h" "src/game.cpp" "src/game.h" "src/transform.h" "src/transform.cpp" "src/imgui_menu.h" "src/imgui_menu.cpp")
+add_executable("Renderer" "src/main.cpp" ${IMGUI_SOURCES} ${RENDERER_SOURCES})
 
 # Macro for resources
 target_compile_definitions("Renderer" PUBLIC RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/")
 
 
-target_link_libraries("Renderer" PRIVATE "SDL3::SDL3" "glm::glm" "opengl32" "glad" "JAWEngine")
+target_link_libraries("Renderer" PRIVATE "SDL3::SDL3" "glm::glm" "opengl32" "glad")
 target_include_directories("Renderer" PRIVATE "thirdParty/glad/include" "thirdParty/stb_image")
+target_include_directories("Renderer" PRIVATE "src/engine/include" "src/engine/renderer/include" "src/engine/services/include" "src/game/include")
 
 
 # Imgui Example

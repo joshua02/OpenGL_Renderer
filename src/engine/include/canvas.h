@@ -7,7 +7,7 @@
 
 #include "renderer.h"
 
-#include <JAWEngine/vec2.h>
+#include "vec2.h"
 
 class Canvas : public GameObject{
 public:
