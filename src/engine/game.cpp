@@ -8,6 +8,7 @@
 
 #include <chrono>
 #include <thread>
+#include "rng.h"
 
 void Game::init() {
 	renderer.init();
@@ -19,7 +20,9 @@ void Game::init() {
 	inputManager.setActionKeys(Action::MoveUp, { SDL_SCANCODE_W, SDL_SCANCODE_UP });
 	inputManager.setActionKeys(Action::MoveDown, { SDL_SCANCODE_S, SDL_SCANCODE_DOWN });
 
-	inputManager.printActions();
+	// Seed RNG
+
+	RNG::setSeed(0x00);
 
 	// Add sprites to the scene
 
