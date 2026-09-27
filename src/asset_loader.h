@@ -24,7 +24,7 @@ public:
 	Shader* getShader(std::string_view vertPath, std::string_view fragPath) {
 		if (auto it{ shaders.find(std::string{vertPath}) }; it != shaders.end()) {
 			//shader already loaded
-			std::cout << "shader already loaded\n";
+			//std::cout << "shader already loaded\n";
 			return &it->second;
 		}
 		else {
@@ -34,7 +34,7 @@ public:
 	Texture* getTexture(std::string_view texturePath) {
 		if (auto it{ textures.find(std::string{texturePath}) }; it != textures.end()) {
 			//texture already loaded
-			std::cout << "texture already loaded\n";
+			//std::cout << "texture already loaded\n";
 			return &it->second;
 		}
 		else {
