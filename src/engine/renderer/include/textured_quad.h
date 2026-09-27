@@ -4,10 +4,11 @@
 
 #include <glm/glm.hpp>
 #include <glad/glad.h>
-#include "vec2.h"
 
-#include "scene.h"
+#include "vec2.h"
+#include "drawable.h"
 #include "transform.h"
+#include "texture.h"
 
 class TexturedQuad : public Drawable {
 public:

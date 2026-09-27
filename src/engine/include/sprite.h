@@ -2,17 +2,8 @@
 #define SPRITE_H
 
 
-#include <array>
-#include <cmath>
-
-#include "shader.h"
-#include "texture.h"
-#include "scene.h"
-
-#include <glad/glad.h>
+#include "gameObject.h"
 #include "vec2.h"
-
-#include <glm/glm.hpp>
 #include "transform.h"
 #include "textured_quad.h"
 

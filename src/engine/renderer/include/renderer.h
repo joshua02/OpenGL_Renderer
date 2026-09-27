@@ -6,12 +6,9 @@
 #include <flat_map>
 #include <SDL3/SDL.h>
 
-#include "shader.h"
-#include "sprite.h"
 #include "imgui_menu.h"
-#include "scene.h"
-
 #include "vec2.h"
+#include "drawable.h"
 
 class Renderer {
 public:

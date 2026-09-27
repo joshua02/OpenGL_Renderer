@@ -1,12 +1,12 @@
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include "scene.h"
+
 #include <vector>
 #include <memory>
 
 #include "renderer.h"
-
+#include "gameObject.h"
 #include "vec2.h"
 
 class Canvas : public GameObject{

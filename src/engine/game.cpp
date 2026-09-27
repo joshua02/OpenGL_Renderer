@@ -1,13 +1,13 @@
 #include "game.h"
-#include "renderer.h"
 
+#include <chrono>
+#include <thread>
+
+#include "renderer.h"
 #include "sprite.h"
 #include "scene.h"
 #include "player_character.h"
 #include "canvas.h"
-
-#include <chrono>
-#include <thread>
 #include "rng.h"
 
 void Game::init() {

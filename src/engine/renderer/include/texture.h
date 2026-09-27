@@ -2,10 +2,10 @@
 #define TEXTURE_H
 
 #include <string>
+#include <iostream>
+
 #include <stb_image.h>
 #include <glad/glad.h>
-
-#include <iostream>
 
 enum class TextureFilter {
 	LINEAR,
